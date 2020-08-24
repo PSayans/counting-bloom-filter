@@ -2,12 +2,14 @@
 #define _BLOOM_H
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
+
 
 typedef unsigned int (*hash_function)(const void *data);
 typedef struct bloom_filter * bloom_t;
 
 /* Creates a new bloom filter with no hash functions and size * 8 bits. */
-bloom_t bloom_create(size_t size);
+bloom_t bloom_create(int64_t size);
 /* Frees a bloom filter. */
 void bloom_free(bloom_t filter);
 /* Adds a hashing function to the bloom filter. You should add all of the

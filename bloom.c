@@ -15,16 +15,18 @@ struct bloom_hash {
 //estructura del propio BF con la lista de hashes, el array de bits (cambiar a integer) y el tamaño
 struct bloom_filter {
     struct bloom_hash *func;
-    void *bits; //cambiar a un puntero de enteros
-    size_t size;
+    int64_t *counters; //cambiar a un puntero de enteros
+    int64_t size;
 };
 
 
 //funcion que crea un filtro de tamaño size
-bloom_t bloom_create(size_t size) {
+bloom_t bloom_create(int64_t size) {
+	//puntero al comienzo del array de bloom_filters (que solo hay 1)
 	bloom_t res = calloc(1, sizeof(struct bloom_filter));
 	res->size = size;
-	res->bits = malloc(size);
+	//se reservan size bytes de memoria y se devuelve un puntero al principio
+	res->counters = calloc(size, sizeof(int64_t));
 	return res;
 }
 
@@ -37,7 +39,7 @@ void bloom_free(bloom_t filter) {
 			filter->func = h->next;
 			free(h);
 		}
-		free(filter->bits);
+		free(filter->counters);
 		free(filter);
 	}
 }
@@ -59,30 +61,53 @@ void bloom_add_hash(bloom_t filter, hash_function func) {
 
 //funcion que añade un elemento item al filtro filter
 void bloom_add(bloom_t filter, const void *item) {
-	struct bloom_hash *h = filter->func;
-	uint8_t *bits = filter->bits;
-	while (h) {
-		unsigned int hash = h->func(item);
-		hash %= filter->size * 8;
-		bits[hash / 8] |= 1 << hash % 8; //esto hay que cambiarlo para que en vez de poner a 1 el bit le meta el valor del contador
-		h = h->next;
+
+	if (!bloom_test(filter, item)){
+		struct bloom_hash *h = filter->func;
+		//variable que contiene el vector m de contadores
+		int64_t *counters = filter->counters;
+		//se itera sobre las funciones de hashing
+		while (h) {
+			//se obtiene el valor del hash
+			unsigned int hash = h->func(item);
+			//hash= hash % filter.size
+			hash = hash % (filter->size);
+			//se incrementa el contador
+			counters[hash] = counters[hash] + 1;
+			h = h->next;
+		}
 	}
 }
 
 //TODO: funcion que elimina el elemento item del filtro filter
 void bloom_remove (bloom_t filter, const void *item) {
-
+	
+	if (bloom_test(filter, item)){
+		struct bloom_hash *h = filter->func;
+		//variable que contiene el vector m de contadores
+		int64_t *counters = filter->counters;
+		//se itera sobre las funciones de hashing
+		while (h) {
+			//se obtiene el valor del hash
+			unsigned int hash = h->func(item);
+			//hash= hash % filter.size
+			hash = hash % (filter->size);
+			//se incrementa el contador
+			counters[hash] = counters[hash] - 1;
+			h = h->next;
+		}
+	}
 }
 
 
 //funcion que evalua la pertenencia del elemento item al filtro filter
 bool bloom_test(bloom_t filter, const void *item) {
 	struct bloom_hash *h = filter->func;
-	uint8_t *bits = filter->bits;
+	int64_t *counters = filter->counters;
 	while (h) {
 		unsigned int hash = h->func(item);
-		hash %= filter->size * 8;
-		if (!(bits[hash / 8] & 1 << hash % 8)) { //esto hay que cambiarlo para que en vez de poner a 1 el bit le meta el valor del contador
+		hash %= filter->size;
+		if (counters[hash] == 0) { 
 			return false;
 		}
 		h = h->next;

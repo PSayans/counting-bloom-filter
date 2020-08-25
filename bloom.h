@@ -3,13 +3,17 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 
 typedef unsigned int (*hash_function)(const void *data);
 typedef struct bloom_filter * bloom_t;
 
 /* Creates a new bloom filter with no hash functions and size * 8 bits. */
-bloom_t bloom_create(int64_t size);
+bloom_t bloom_create(size_t size);
+
+void bloom_remove (bloom_t filter, const void *item);
+
 /* Frees a bloom filter. */
 void bloom_free(bloom_t filter);
 /* Adds a hashing function to the bloom filter. You should add all of the
@@ -22,5 +26,7 @@ void bloom_add(bloom_t filter, const void *item);
  * Returns false if the item has definitely not been added before. Returns true
  * if the item was probably added before. */
 bool bloom_test(bloom_t filter, const void *item);
+
+void filter_dump(bloom_t filter);
 
 #endif

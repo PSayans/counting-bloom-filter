@@ -1,6 +1,7 @@
 #include "bloom.h"
 #include <stdio.h>
 
+
 unsigned int djb2(const void *_str) {
 	const char *str = _str;
 	unsigned int hash = 5381;
@@ -32,7 +33,18 @@ int main() {
 	bloom_add_hash(bloom, jenkins);
 	printf("Should be 0: %d\n", bloom_test(bloom, "hello world"));
 	bloom_add(bloom, "hello world");
+	bloom_add(bloom, "mi");
+	bloom_add(bloom, "gato");
+	filter_dump(bloom);
+	bloom_add(bloom, "se");
+	bloom_add(bloom, "llama");
+	bloom_add(bloom, "guantes");
+	filter_dump(bloom);
 	printf("Should be 1: %d\n", bloom_test(bloom, "hello world"));
+	bloom_remove(bloom, "se");
+	bloom_remove(bloom, "llama");
+	bloom_remove(bloom, "guantes");
+	filter_dump(bloom);
 	printf("Should (probably) be 0: %d\n", bloom_test(bloom, "world hello"));
 	return 0;
 }

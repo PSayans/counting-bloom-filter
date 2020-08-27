@@ -66,15 +66,17 @@ void bloom_add(bloom_t filter, const void *item) {
 	//variable que contiene el vector m de contadores
 	int32_t *counters = filter->counters;
 	//se itera sobre las funciones de hashing
+	int i = 0;
 	while (h) {
 		//se obtiene el valor del hash
-		unsigned int hash = h->func(item);
+		unsigned int hash = h->func(item,i);
 		//hash= hash % filter.size
 		hash = hash % (filter->size);
 		//printf("Se incrementa el contador de la posicion %d\n",hash);
 		//se incrementa el contador
 		counters[hash] = counters[hash] + 1;
 		h = h->next;
+		i++;
 	}
 }
 
@@ -84,15 +86,17 @@ void bloom_remove (bloom_t filter, const void *item) {
 	//variable que contiene el vector m de contadores
 	int32_t *counters = filter->counters;
 	//se itera sobre las funciones de hashing
+	int i = 0;
 	while (h) {
 		//se obtiene el valor del hash
-		unsigned int hash = h->func(item);
+		unsigned int hash = h->func(item,i);
 		//hash= hash % filter.size
 		hash = hash % (filter->size);
 		//se incrementa el contador
 		//printf("Se incrementa el contador de la posicion %d\n",hash);
 		counters[hash] = counters[hash] - 1;
 		h = h->next;
+		i++;
 	}
 }
 
@@ -101,13 +105,15 @@ void bloom_remove (bloom_t filter, const void *item) {
 bool bloom_test(bloom_t filter, const void *item) {
 	struct bloom_hash *h = filter->func;
 	int32_t *counters = filter->counters;
+	int i = 0;
 	while (h) {
-		unsigned int hash = h->func(item);
+		unsigned int hash = h->func(item,i);
 		hash %= filter->size;
 		if (counters[hash] == 0) { 
 			return false;
 		}
 		h = h->next;
+		i++;
 	}
 	return true;
 }

@@ -52,6 +52,20 @@ int main() {
 	bloom_remove(bloom, "guantes");
 	filter_dump(bloom);
 	printf("Should (probably) be 0: %d\n", bloom_test(bloom, "world hello"));
+
+
+
+	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
+	//calcular el FPP de este vector sobre un filtro vacio
+	/* for n iteraciones:
+		-generar vector aleatorio de longitud X
+		-insertar elemento
+		-calcular delta
+		-comparar con el mejor delta existente
+		-si es mejor que el mejor se convierte en el nuevo mejor
+		-eliminamos el elemento
+	*/
+
 	return 0;
 }
 

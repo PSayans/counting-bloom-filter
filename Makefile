@@ -1,5 +1,8 @@
-bloom: main.c bloom.c
-	cc -g -o bloom main.c bloom.c
+bloom: bloom.c
+	cc -g bloom.c -o bloom.o
+
+main: main.c bloom.o
+	cc -g -o main -Wall main.c -lcrypto -lssl bloom.o 
 
 clean:
-	rm bloom
+	rm main

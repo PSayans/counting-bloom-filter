@@ -2,54 +2,40 @@
 #include <stdio.h>
 #include <openssl/md5.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 //bloom_add_hash(bloom,md5)
 unsigned int md5 (const void *_str, int round) {
 
 	MD5_CTX c;
 	MD5_Init(&c);
-	int length=64;
-
-	int n;
-    unsigned char digest[16];
-    char *out = (char*)malloc(33);
+	int length=strnlen(_str,64);
+    char digest[16];
 
     MD5_Init(&c);
-
-    while (length > 0) {
-        if (length > 512) {
-            MD5_Update(&c, _str, 512);
-        } else {
-            MD5_Update(&c, _str, length);
-        }
-        length -= 512;
-        _str += 512;
-    }
-
+	MD5_Update(&c, _str, length);
     MD5_Final(digest, &c);
 
-	unsigned int hash,v1,v2,v3,v4;
-	sscanf(digest[0], "%x", &v1);
-	sscanf(digest[8], "%x", &v2);
-	sscanf(digest[16], "%x", &v3);
-	sscanf(digest[24], "%x", &v4);
+	unsigned int hash=0;
 
 	if (round == 0){
-		hash= v1^v2;
+		for (int i = 0; i<8; i++) {
+			hash = hash + (unsigned int) digest[i];
+		}
 	}
 	else {
-		hash=v3^v4;
+		for (int i = 8; i<16; i++) {
+			hash = hash + (unsigned int) digest[i];
+		}
 	}
-
+	printf("%s%zu%s%d%s","Valor de retorno del hash:",hash," en ronda:",round,"\n");
 	//some shit to cast it to int
 	return hash;
 }
 
-
 int main() {
-	
-	bloom_t bloom = bloom_create(8);
+	bloom_t bloom = bloom_create(16);
+	bloom_add_hash(bloom,md5);
 	bloom_add_hash(bloom,md5);
 	printf("Should be 0: %d\n", bloom_test(bloom, "hello world"));
 	bloom_add(bloom, "hello world");

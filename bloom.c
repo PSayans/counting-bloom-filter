@@ -107,6 +107,7 @@ bool bloom_test(bloom_t filter, const void *item) {
 	int32_t *counters = filter->counters;
 	int i = 0;
 	while (h) {
+		printf("gogogo\n");
 		unsigned int hash = h->func(item,i);
 		hash %= filter->size;
 		if (counters[hash] == 0) { 

@@ -5,7 +5,7 @@
 #include <string.h>
 
 //bloom_add_hash(bloom,md5)
-unsigned int md5 (const void *_str, int round) {
+ uint64_t md5 (const void *_str, int round) {
 
 	MD5_CTX c;
 	MD5_Init(&c);
@@ -16,16 +16,16 @@ unsigned int md5 (const void *_str, int round) {
 	MD5_Update(&c, _str, length);
     MD5_Final(digest, &c);
 
-	unsigned int hash=0;
+	uint64_t hash=0;
 
 	if (round == 0){
 		for (int i = 0; i<8; i++) {
-			hash = hash + (unsigned int) digest[i];
+			hash = hash + digest[i];
 		}
 	}
 	else {
 		for (int i = 8; i<16; i++) {
-			hash = hash + (unsigned int) digest[i];
+			hash = hash + digest[i];
 		}
 	}
 	printf("%s%zu%s%d%s","Valor de retorno del hash:",hash," en ronda:",round,"\n");
@@ -34,7 +34,7 @@ unsigned int md5 (const void *_str, int round) {
 }
 
 int main() {
-	bloom_t bloom = bloom_create(16);
+	bloom_t bloom = bloom_create(128);
 	bloom_add_hash(bloom,md5);
 	bloom_add_hash(bloom,md5);
 	printf("Should be 0: %d\n", bloom_test(bloom, "hello world"));

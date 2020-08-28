@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 
-typedef unsigned int (*hash_function)(const void *data, int round);
+typedef uint64_t (*hash_function)(const void *data, int round);
 typedef struct bloom_filter * bloom_t;
 
 /* Creates a new bloom filter with no hash functions and size * 8 bits. */

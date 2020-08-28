@@ -69,7 +69,7 @@ void bloom_add(bloom_t filter, const void *item) {
 	int i = 0;
 	while (h) {
 		//se obtiene el valor del hash
-		unsigned int hash = h->func(item,i);
+		uint64_t hash = h->func(item,i);
 		//hash= hash % filter.size
 		hash = hash % (filter->size);
 		//printf("Se incrementa el contador de la posicion %d\n",hash);
@@ -89,7 +89,7 @@ void bloom_remove (bloom_t filter, const void *item) {
 	int i = 0;
 	while (h) {
 		//se obtiene el valor del hash
-		unsigned int hash = h->func(item,i);
+		uint64_t hash = h->func(item,i);
 		//hash= hash % filter.size
 		hash = hash % (filter->size);
 		//se incrementa el contador
@@ -107,8 +107,7 @@ bool bloom_test(bloom_t filter, const void *item) {
 	int32_t *counters = filter->counters;
 	int i = 0;
 	while (h) {
-		printf("gogogo\n");
-		unsigned int hash = h->func(item,i);
+		uint64_t hash = h->func(item,i);
 		hash %= filter->size;
 		if (counters[hash] == 0) { 
 			return false;

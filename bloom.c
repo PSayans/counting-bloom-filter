@@ -72,7 +72,7 @@ void bloom_add(bloom_t filter, const void *item) {
 		uint64_t hash = h->func(item,i);
 		//hash= hash % filter.size
 		hash = hash % (filter->size);
-		//printf("Se incrementa el contador de la posicion %d\n",hash);
+		//printf("Se incrementa el contador de la posicion %ld\n",hash);
 		//se incrementa el contador
 		counters[hash] = counters[hash] + 1;
 		h = h->next;

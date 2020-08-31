@@ -37,34 +37,31 @@ int vectorLen;
 	return hash;
 }
 
-double measure_fpp (char** f, double reference_delta) {
+double measure_fpp (char** f) {
 	int fpp_counter=0;
 
 	for (int i=0; i<vectorLen; i++){
-		clock_t begin = clock();
-		bloom_test(filter,f[i]);
-		clock_t end = clock();
-		double lookup_delta = (double) (end - begin) / CLOCKS_PER_SEC;
-		if (lookup_delta>=reference_delta){
+		if (bloom_test(filter,f[i])){
 			fpp_counter++;
 			//printf("%s%f%s","He encontrado un FP! lookup delta: ", lookup_delta, "\n");
 
 		}
 	}
-	double f_fpp = ((double) fpp_counter / vectorLen) * 100;
+	double f_fpp = ((double) fpp_counter / vectorLen);
 
 	return f_fpp;
 }
 
 int main(int argc, char* argv[]) {
 	
-	filter = bloom_create(10);
-	bloom_add_hash(filter,md5);
-	bloom_add_hash(filter,md5);
-	
 	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
 	vectorLen = atoi(argv[1]);
 	int n_rounds = atoi(argv[2]);
+	size_t filter_size = atoi(argv[3]);
+
+	filter = bloom_create(filter_size);
+	bloom_add_hash(filter,md5);
+	bloom_add_hash(filter,md5);
 
 	char ** f;
 
@@ -85,19 +82,20 @@ int main(int argc, char* argv[]) {
 		//printf("%s%d%s%s%s","el contenido del array random en pos", i, " es:",f[i],"\n");
 	}
 	printf("Vector F generado.\n");
+
+	//test de insercion
+	/*if (strncmp("true",argv[3],5)==0){
+		for (int i = 0; i < vectorLen; i++){
+			bloom_add(filter,f[i]);
+		}
+		filter_dump(filter);
+		return 0;
+	}
+	*/
+
 	//calcular el FPP de este vector sobre un filtro vacio
 	//el FPP se calcula midiendo el total de matches/número de elementos probados
-	bloom_add(filter,"123456789");
-	clock_t begin = clock();
-	bloom_test(filter,"123456789");
-	clock_t end = clock();
-	double reference_delta = (double) (end - begin) / CLOCKS_PER_SEC;
-	printf("%s%f%s","reference delta: ", reference_delta, "\n");
-	bloom_remove(filter,"123456789");
-	double fpp_before = measure_fpp(f, reference_delta);
-	printf("%s%f%s", "El FPP para el vector F es:", fpp_before,"\n");
-	
-	/* for n iteraciones:
+		/* for n iteraciones:
 		-generar vector aleatorio de longitud X
 		-insertar elemento
 		-calcular delta
@@ -106,21 +104,25 @@ int main(int argc, char* argv[]) {
 		-eliminamos el elemento
 	*/
 	int rounds_counter = 0;
-	float delta_max = 0;
 
 	while (rounds_counter < n_rounds){
 		
+		float delta_max = 0;
 		char * best_element=malloc(8);
-		//we generate a random set of elements T
 		char ** t;
-
-		t = malloc(vectorLen * sizeof(char*));
-
-		for (int i = 0; i < vectorLen; i++)
-			t[i] = malloc(8 * sizeof(char));
-
+		double fpp_before = measure_fpp(f);
+		printf("%s%f%s", "El FPP para el vector F es:", fpp_before,"\n");
+		
+		//we generate a random set of elements T
+		//generamos el vector T
 		printf("%s%d%s%d%s","Se genera el vector aleatorio T con ", vectorLen, " posiciones de 64 bits cada una en la ronda ",
 			rounds_counter, ".\n");
+		t = malloc(vectorLen * sizeof(char*));
+
+		for (int i = 0; i < vectorLen; i++) {
+			t[i] = malloc(8 * sizeof(char));
+		}
+
 		for (int i = 0; i < vectorLen; i++){
 			char element[8];
 			for (int k=0;k<8;k++){
@@ -131,15 +133,23 @@ int main(int argc, char* argv[]) {
 		}
 		printf("Vector T generado.\n");
 		
+		//aplicamos el algoritmo
 		for (int i =0; i < vectorLen; i++){
 			
 			char * element = t[i];
 			bloom_add(filter, element);
-			double fpp_after = measure_fpp(f,reference_delta);
+			double fpp_after = measure_fpp(f);
+			if (fpp_before >= 1){
+				printf("Filtro polucionado\n");
+				return 0;
+			}
 			printf("%s%f%s%d%s", "El FPP para el vector T es:", fpp_after," en la ronda ",rounds_counter, "\n");
 			double delta = fpp_after-fpp_before;
-			if (delta >= delta_max){
-				printf("muero\n");
+			//printf("%s%f\n","valor de delta:",delta);
+			//printf("%s%f\n","valor de delta_max:",delta_max);
+
+			if (delta > delta_max){
+				printf("hemos encontrado un candidato\n");
 				strncpy(best_element,element,8);
 				delta_max=delta;
 			}
@@ -147,14 +157,16 @@ int main(int argc, char* argv[]) {
 
 		}
 		printf("%s%s\n", "Se inserta el elemento ", best_element);
+		printf("%s\n",best_element);
 		bloom_add(filter,best_element);
 		free(best_element);
+		free(t);
 		rounds_counter++;
 	}
-
-	double final_fpp = measure_fpp(f,reference_delta);
+	filter_dump(filter);
+	double final_fpp = measure_fpp(f);
 	printf("%s%f%s%d%s", "El FPP para el vector F al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
-
+	bloom_free(filter);
 	return 0;
 }
 

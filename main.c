@@ -107,7 +107,10 @@ int main(int argc, char* argv[]) {
 
 	while (rounds_counter < n_rounds){
 		
-		float delta_max = 0;
+		double *delta_max = malloc(sizeof(double));
+		double aux = 0;
+		delta_max = &aux;
+
 		char * best_element=malloc(8);
 		char ** t;
 		double fpp_before = measure_fpp(f);
@@ -148,10 +151,10 @@ int main(int argc, char* argv[]) {
 			//printf("%s%f\n","valor de delta:",delta);
 			//printf("%s%f\n","valor de delta_max:",delta_max);
 
-			if (delta > delta_max){
+			if (delta > *delta_max){
 				printf("hemos encontrado un candidato\n");
 				strncpy(best_element,element,8);
-				delta_max=delta;
+				*delta_max=delta;
 			}
 			bloom_remove(filter,element);
 

@@ -121,8 +121,12 @@ bool bloom_test(bloom_t filter, const void *item) {
 void filter_dump(bloom_t filter) {
 	int32_t* counters = filter->counters;
 	size_t i = 0;
+	FILE *fp;
+	fp = fopen("filter_output.txt","w+");
 	while(i<filter->size){
-		printf("The counter at position %zu has the value %d\n", i,counters[i]);
+		//printf("The counter at position %zu has the value %d\n", i,counters[i]);
+		fprintf(fp,"%zu%s%d\n", i,",",counters[i]);
 		i++;
 	}
+	fclose(fp);
 }

@@ -6,7 +6,7 @@
 
 double calculate_ideal_fpp(double k, double m, double n){
 
-	return pow(1 - exp(-k / (m/n)),k);
+	return pow((n*k)/m,k);
 }
 
 

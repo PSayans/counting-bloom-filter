@@ -21,7 +21,7 @@ struct t_fpp {
 double calculate_ideal_fpp(double k, double m, double n){
 
 	//return pow(1 - exp(-k / (m/n)),k);
-	return pow(n*k/m,k);
+	return pow((n*k)/m,k);
 }
 
 //bloom_add_hash(bloom,md5)

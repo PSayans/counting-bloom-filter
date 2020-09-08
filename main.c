@@ -43,7 +43,6 @@ double calculate_ideal_fpp(double k, double m, double n){
 	}
 	else {
 		for (int i = 8; i<16; i++) {
-			//hash = hash + digest[i];
 			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));
 		}
 	}
@@ -104,28 +103,7 @@ int main(int argc, char* argv[]) {
 
 	char ** f = generate_random_vector(vectorLen_f);
 
-/*	struct t_fpp* last = calloc(1, sizeof(struct t_fpp));
-
-
-
-	for (int i = 0; i<n_rounds;i++){
-		struct t_fpp* fpp = calloc(1, sizeof(struct t_fpp));
-		fpp->position=i;
-		fpp->fpp=calculate_ideal_fpp((double)2, (double)filter_size,n_rounds);
-
-	}*/
-
 	printf("Vector F generado.\n");
-
-	//test de insercion
-	/*if (strncmp("true",argv[3],5)==0){
-		for (int i = 0; i < vectorLen; i++){
-			bloom_add(filter,f[i]);
-		}
-		filter_dump(filter);
-		return 0;
-	}
-	*/
 
 	//calcular el FPP de este vector sobre un filtro vacio
 	//el FPP se calcula midiendo el total de matches/número de elementos probados
@@ -142,14 +120,14 @@ int main(int argc, char* argv[]) {
 	clock_t begin=clock();
 	while (rounds_counter < n_rounds){
 		
-		double *delta_max = malloc(sizeof(double));
-		double aux = 0;
-		delta_max = &aux;
+		//double *delta_max = malloc(sizeof(double));
+		//double aux = 0;
+		//delta_max = &aux;
 		double fpp_after;
 
 		char * best_element=malloc(8);
 		char ** t;
-		double fpp_before = measure_fpp(f, vectorLen_f);
+		//double fpp_before = measure_fpp(f, vectorLen_f);
 		
 		//we generate a random set of elements T
 		//generamos el vector T
@@ -164,20 +142,24 @@ int main(int argc, char* argv[]) {
 			char * element = t[i];
 			bloom_add(filter, element);
 			fpp_after = measure_fpp(f, vectorLen_f);
-			if (fpp_before >= 1){
+			if (fpp_after >= 1){
+				clock_t end = clock();
+				double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
+				printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");
 				printf("Filtro polucionado\n");
 				filter_dump(filter);
 				bloom_free(filter);
 				return 0;
 			}
-			double delta = fpp_after-fpp_before;
-			double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)n_rounds);
-
+			//double delta = fpp_after-fpp_before;
+			double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)rounds_counter);
+			printf("%f\n",ideal_fpp);
 			//if (delta > *delta_max){
-			if (delta >= ideal_fpp){
+			if (fpp_after >= ideal_fpp){
 
 				strncpy(best_element,element,8);
-				*delta_max=delta;
+				break;
+				//*delta_max=delta;
 			}
 			bloom_remove(filter,element);
 

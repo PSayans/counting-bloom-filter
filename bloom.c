@@ -72,7 +72,7 @@ void bloom_add(bloom_t filter, const void *item) {
 		uint64_t hash = h->func(item,i);
 		//hash= hash % filter.size
 		hash = hash % (filter->size);
-		//printf("Se incrementa el contador de la posicion %d\n",hash);
+		//printf("Se incrementa el contador de la posicion %ld\n",hash);
 		//se incrementa el contador
 		counters[hash] = counters[hash] + 1;
 		h = h->next;
@@ -121,8 +121,12 @@ bool bloom_test(bloom_t filter, const void *item) {
 void filter_dump(bloom_t filter) {
 	int32_t* counters = filter->counters;
 	size_t i = 0;
+	FILE *fp;
+	fp = fopen("filter_output.txt","w+");
 	while(i<filter->size){
-		printf("The counter at position %zu has the value %d\n", i,counters[i]);
+		//printf("The counter at position %zu has the value %d\n", i,counters[i]);
+		fprintf(fp,"%zu%s%d\n", i,",",counters[i]);
 		i++;
 	}
+	fclose(fp);
 }

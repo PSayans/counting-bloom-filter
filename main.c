@@ -20,7 +20,8 @@ struct t_fpp {
 
 double calculate_ideal_fpp(double k, double m, double n){
 
-	return pow(1 - exp(-k / (m/n)),k);
+	//return pow(1 - exp(-k / (m/n)),k);
+	return pow(n*k/m,k);
 }
 
 //bloom_add_hash(bloom,md5)
@@ -171,11 +172,9 @@ int main(int argc, char* argv[]) {
 				return 0;
 			}
 			double delta = fpp_after-fpp_before;
-			double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)n_rounds);
+			//double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)n_rounds);
 
-			//if (delta > *delta_max){
-			if (delta >= ideal_fpp){
-
+			if (delta > *delta_max){
 				strncpy(best_element,element,8);
 				*delta_max=delta;
 			}

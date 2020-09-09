@@ -4,7 +4,7 @@
 
 double calculate_ideal_fpp(double k, double m, double n){
 
-	return pow(1 - exp(-k / (m/n)),k);
+	return pow((n*k)/m,k);
 }
 
 
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     FILE *fp;
 	fp = fopen("fpp.txt","w+");
 
-    for (int i=0; i<n_rounds;i++){
+    for (int i=0; i<=n_rounds;i++){
         double fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)i);
 		fprintf(fp,"%d%s%f\n", i,",",fpp);
     }

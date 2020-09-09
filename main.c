@@ -89,7 +89,7 @@ char ** generate_random_vector(int length) {
 		vector[i] = malloc(8 * sizeof(char));
 
 
-	srand((unsigned int) time (NULL));
+	//srand((unsigned int) time (NULL));
 	//char f [vectorLen][8];
 	//printf("%s%d%s","Se genera el vector aleatorio con ", vectorLen_f, " posiciones de 64 bits cada una.\n");
 	for (int i = 0; i < length; i++){
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 	filter = bloom_create(filter_size);
 	bloom_add_hash(filter,md5);
 	bloom_add_hash(filter,md5);
-	bloom_add_hash(filter,sha1);
+	//bloom_add_hash(filter,sha1);
 
 	char ** f = generate_random_vector(vectorLen_f);
 

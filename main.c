@@ -5,6 +5,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <openssl/sha.h>
 
 
 bloom_t filter;
@@ -52,7 +53,18 @@ double calculate_ideal_fpp(double k, double m, double n){
 	return hash;
 }
 
-
+ uint64_t sha1 (const void *_str, int round) {
+	 
+	int length=strnlen(_str,64);
+	unsigned char digest[20];
+	
+	SHA1(_str,length,digest);
+	uint64_t hash=0;
+	for (int i = 0; i<8; i++) {
+		hash  = hash | ((uint64_t)digest[i] << (8*i)); 
+	}
+	return hash;
+ }
 
 double measure_fpp (char** f, int vectorLen) {
 	int fpp_counter=0;
@@ -106,6 +118,7 @@ int main(int argc, char* argv[]) {
 	filter = bloom_create(filter_size);
 	bloom_add_hash(filter,md5);
 	bloom_add_hash(filter,md5);
+	bloom_add_hash(filter,sha1);
 
 	char ** f = generate_random_vector(vectorLen_f);
 

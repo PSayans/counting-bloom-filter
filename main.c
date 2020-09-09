@@ -52,6 +52,8 @@ double calculate_ideal_fpp(double k, double m, double n){
 	return hash;
 }
 
+
+
 double measure_fpp (char** f, int vectorLen) {
 	int fpp_counter=0;
 
@@ -74,15 +76,17 @@ char ** generate_random_vector(int length) {
 	for (int i = 0; i < length; i++)
 		vector[i] = malloc(8 * sizeof(char));
 
+
+	srand((unsigned int) time (NULL));
 	//char f [vectorLen][8];
 	//printf("%s%d%s","Se genera el vector aleatorio con ", vectorLen_f, " posiciones de 64 bits cada una.\n");
 	for (int i = 0; i < length; i++){
 
-		char element[8]="";
+		char element[8];
 		for (int k=0;k<8;k++){
 			element[k]=random();
 		}
-		strncat(vector[i],element,8);
+		strncpy(vector[i],element,8);
 		//printf("%s%d%s%s%s","el contenido del array random en pos", i, " es:",f[i],"\n");
 	}
 
@@ -182,6 +186,7 @@ int main(int argc, char* argv[]) {
 
 		}
 		printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
+		//printf("%s%s\n", "el elemento insertado es:",best_element);
 		bloom_add(filter,best_element);
 		free(best_element);
 		free(t);

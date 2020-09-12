@@ -260,12 +260,30 @@ int main(int argc, char* argv[]) {
 
 	/*------------------Inicio Algoritmo fpp ideal-----------------*/
 
+	double ideal_fpp_before = calculate_ideal_fpp((double)predicted_filter->hash_number,(double)predicted_filter->filter_size,
+				(double)rounds_counter-1);
+
+	double ideal_fpp_after;
+	double fpp_before;
+	double fpp_after;
+	bool inserted= false;
+
+
 	while (rounds_counter < n_rounds){
 			
-		double fpp_after;
 		char * best_element=malloc(8);
 		char ** t;
-		
+		double *delta_max = malloc(sizeof(double));
+		double aux = 0;
+		delta_max = &aux;
+
+		fpp_before=measure_fpp(f, vectorLen_f);
+
+		ideal_fpp_after = calculate_ideal_fpp((double)predicted_filter->hash_number,(double)predicted_filter->filter_size,
+				(double)rounds_counter);
+
+		double ideal_delta=ideal_fpp_after-ideal_fpp_before;
+
 		t = generate_random_vector(vectorLen_t);
 		best_element=t[0];
 		//aplicamos el algoritmo
@@ -283,20 +301,33 @@ int main(int argc, char* argv[]) {
 				bloom_free(filter);
 				return 0;
 			}
-			double ideal_fpp = calculate_ideal_fpp((double)predicted_filter->hash_number,(double)predicted_filter->filter_size,
-				(double)rounds_counter);
+			double delta=fpp_after-fpp_before;
+			
 			//printf("%f\n",ideal_fpp);
-			if (fpp_after >= ideal_fpp){
+			if (delta>=ideal_delta){
 				strncpy(best_element,element,8);
+				inserted=true;
 				break;
 			}
+			if (delta > *delta_max){
+				strncpy(best_element,element,8);
+				*delta_max=delta;
+			}
 			bloom_remove(filter,element);
+
+		}
+		if(inserted){
+			inserted=false;
+		}
+		else{
+			bloom_add(filter,best_element);
+			inserted=false;
 		}
 		printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
-		bloom_add(filter,best_element);
 		free(best_element);
 		free(t);
 		rounds_counter++;
+		ideal_fpp_before=ideal_fpp_after;
 	}
 
 	/*------------------Fin Algoritmo fpp ideal-----------------*/

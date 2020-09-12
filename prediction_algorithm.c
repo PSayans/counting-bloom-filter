@@ -58,22 +58,30 @@ struct t_fpp* load_fpps(char* path){
 	return first;
 }
 
-struct t_fpp* predict_filter_type(double fpp, struct t_fpp* list){
+struct t_fpp predict_filter_type(double fpp, struct t_fpp* list){
 
 	struct t_fpp* last=list;
-	struct t_fpp* best_node=last;
+	struct t_fpp best_node;
 
 	double best_delta=fabs(fpp-last->fpp);
+	double delta;
 
 	while(last->next != NULL){
-		double delta=fabs(fpp-last->fpp);
+		delta=fabs(fpp-last->fpp);
+		printf("%s%fl\n","Diferencia:",delta);
 		if (delta<best_delta){
 			best_delta=delta;
-			best_node=last;
+			best_node=*last;
 		}
 		last= last->next;
 	}
-
+	printf("%s%fl\n","Contenido del FPP:",last->fpp);
+	delta=fabs(fpp-last->fpp);
+	printf("%s%fl\n","Diferencia:",delta);
+	if (delta<best_delta){
+		best_delta=delta;
+		best_node=*last;
+	}
 	return best_node;
 }
 
@@ -254,8 +262,9 @@ int main(int argc, char* argv[]) {
 
 	char** random_vector = generate_random_vector(vectorLen_f);
 	double final_lookup_fpp = measure_fpp(random_vector, vectorLen_f);
-	struct t_fpp* predicted_filter = predict_filter_type(final_lookup_fpp,list);
+	struct t_fpp p_predicted_filter = predict_filter_type(final_lookup_fpp,list);
 	
+	struct t_fpp* predicted_filter = &p_predicted_filter;
 	printf("%s%d%s%d\n", "El filtro detectado corresponde a k=", predicted_filter->hash_number, ", m=", predicted_filter->filter_size);
 
 	/*------------------Inicio Algoritmo fpp ideal-----------------*/
@@ -267,6 +276,10 @@ int main(int argc, char* argv[]) {
 	double fpp_before;
 	double fpp_after;
 	bool inserted= false;
+	double delta_array[predicted_filter->hash_number];
+
+
+	//definimos un array con tantos elementos tenga K para comprobar las deltas
 
 
 	while (rounds_counter < n_rounds){
@@ -274,8 +287,10 @@ int main(int argc, char* argv[]) {
 		char * best_element=malloc(8);
 		char ** t;
 		double *delta_max = malloc(sizeof(double));
+		double best_k_delta=0;
 		double aux = 0;
 		delta_max = &aux;
+		int k_delta_counter=0;
 
 		fpp_before=measure_fpp(f, vectorLen_f);
 
@@ -302,7 +317,6 @@ int main(int argc, char* argv[]) {
 				return 0;
 			}
 			double delta=fpp_after-fpp_before;
-			
 			//printf("%f\n",ideal_fpp);
 			if (delta>=ideal_delta){
 				strncpy(best_element,element,8);

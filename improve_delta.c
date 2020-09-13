@@ -195,12 +195,13 @@ int main(int argc, char* argv[]) {
 			bloom_remove(filter,element);
 		}
         if(inserted){
-			inserted=false;
-		}
-		else{
-			bloom_add(filter,best_element);
-			inserted=false;
-		}
+            inserted=false;
+        }
+        else{
+            bloom_add(filter,best_element);
+            best_delta = *delta_max;      
+            inserted=false;
+        }
 		printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
 		//printf("%s%s\n", "el elemento insertado es:",best_element);
 		bloom_add(filter,best_element);

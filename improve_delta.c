@@ -60,7 +60,7 @@ double calculate_ideal_fpp(double k, double m, double n){
 	
 	SHA1(_str,length,digest);
 	uint64_t hash=0;
-	if (round == 3){
+	if (round == 0){
 		for (int i = 0; i<8; i++) {
 			hash  = hash | ((uint64_t)digest[i] << (8*i)); 
 		}
@@ -141,40 +141,22 @@ int main(int argc, char* argv[]) {
         bloom_add_hash(filter,sha1);
         bloom_add_hash(filter,sha1);
     }
+
 	char ** f = generate_random_vector(vectorLen_f);
-
-/*	struct t_fpp* last = calloc(1, sizeof(struct t_fpp));
-
-
-
-	for (int i = 0; i<n_rounds;i++){
-		struct t_fpp* fpp = calloc(1, sizeof(struct t_fpp));
-		fpp->position=i;
-		fpp->fpp=calculate_ideal_fpp((double)2, (double)filter_size,n_rounds);
-
-	}*/
 
 	printf("Vector F generado.\n");
 
-	//calcular el FPP de este vector sobre un filtro vacio
-	//el FPP se calcula midiendo el total de matches/número de elementos probados
-		/* for n iteraciones:
-		-generar vector aleatorio de longitud X
-		-insertar elemento
-		-calcular delta
-		-comparar con el mejor delta existente
-		-si es mejor que el mejor se convierte en el nuevo mejor
-		-eliminamos el elemento
-	*/
 	int rounds_counter = 0;
 
 	clock_t begin=clock();
+    double best_delta = 0;
 	while (rounds_counter < n_rounds){
 		
 		double *delta_max = malloc(sizeof(double));
 		double aux = 0;
 		delta_max = &aux;
 		double fpp_after;
+        bool inserted=false;
 
 		char * best_element=malloc(8);
 		char ** t;
@@ -200,14 +182,24 @@ int main(int argc, char* argv[]) {
 				return 0;
 			}
 			double delta = fpp_after-fpp_before;
-			//double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)n_rounds);
-
-			if (delta > *delta_max){
+			if (delta > best_delta){
+				strncpy(best_element,element,8);
+				best_delta=delta;
+                inserted=true;
+				break;
+			}
+            if (delta > *delta_max){
 				strncpy(best_element,element,8);
 				*delta_max=delta;
 			}
 			bloom_remove(filter,element);
-
+		}
+        if(inserted){
+			inserted=false;
+		}
+		else{
+			bloom_add(filter,best_element);
+			inserted=false;
 		}
 		printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
 		//printf("%s%s\n", "el elemento insertado es:",best_element);
@@ -226,11 +218,5 @@ int main(int argc, char* argv[]) {
 	double final_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
 	bloom_free(filter);
-
-	FILE *fp;
-	fp = fopen("results.txt","a");
-	fprintf(fp,"%s\n","t,n,m,k,fpp,time");
-	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
-
 	return 0;
 }

@@ -219,5 +219,11 @@ int main(int argc, char* argv[]) {
 	double final_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
 	bloom_free(filter);
+    free(f);
+    FILE *fp;
+	fp = fopen("results_improve_delta.txt","a");
+	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
+	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
+
 	return 0;
 }

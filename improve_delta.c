@@ -224,6 +224,6 @@ int main(int argc, char* argv[]) {
 	fp = fopen("results_improve_delta.txt","a");
 	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
 	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
-
+	fclose(fp);
 	return 0;
 }

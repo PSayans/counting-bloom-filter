@@ -14,12 +14,12 @@ int vectorLen_t;
 
 struct t_fpp {
 	size_t position;
-	double fpp;
+	float fpp;
 	struct t_fpp* next;
 };
 
 
-double calculate_ideal_fpp(double k, double m, double n){
+float calculate_ideal_fpp(float k, float m, float n){
 
 	//return pow(1 - exp(-k / (m/n)),k);
 	return pow(n*k/m,k);
@@ -74,7 +74,7 @@ double calculate_ideal_fpp(double k, double m, double n){
 	return hash;
  }
 
-double measure_fpp (char** f, int vectorLen) {
+float measure_fpp (char** f, int vectorLen) {
 	int fpp_counter=0;
 
 	for (int i=0; i<vectorLen; i++){
@@ -83,7 +83,7 @@ double measure_fpp (char** f, int vectorLen) {
 
 		}
 	}
-	double f_fpp = ((double) fpp_counter / vectorLen);
+	float f_fpp = ((float) fpp_counter / vectorLen);
 
 	return f_fpp;
 }
@@ -97,8 +97,7 @@ char ** generate_random_vector(int length) {
 		vector[i] = malloc(8 * sizeof(char));
 
 
-	//srand((unsigned int) time (NULL));
-	//char f [vectorLen][8];
+	srand((unsigned int) time (NULL));
 	//printf("%s%d%s","Se genera el vector aleatorio con ", vectorLen_f, " posiciones de 64 bits cada una.\n");
 	for (int i = 0; i < length; i++){
 
@@ -143,17 +142,6 @@ int main(int argc, char* argv[]) {
     }
 	char ** f = generate_random_vector(vectorLen_f);
 
-/*	struct t_fpp* last = calloc(1, sizeof(struct t_fpp));
-
-
-
-	for (int i = 0; i<n_rounds;i++){
-		struct t_fpp* fpp = calloc(1, sizeof(struct t_fpp));
-		fpp->position=i;
-		fpp->fpp=calculate_ideal_fpp((double)2, (double)filter_size,n_rounds);
-
-	}*/
-
 	printf("Vector F generado.\n");
 
 	//calcular el FPP de este vector sobre un filtro vacio
@@ -171,14 +159,14 @@ int main(int argc, char* argv[]) {
 	clock_t begin=clock();
 	while (rounds_counter < n_rounds){
 		
-		double *delta_max = malloc(sizeof(double));
-		double aux = 0;
+		float *delta_max = malloc(sizeof(float));
+		float aux = 0;
 		delta_max = &aux;
-		double fpp_after;
+		float fpp_after;
 
 		char * best_element=malloc(8);
 		char ** t;
-		double fpp_before = measure_fpp(f, vectorLen_f);
+		float fpp_before = measure_fpp(f, vectorLen_f);
 		
 		//we generate a random set of elements T
 		//generamos el vector T
@@ -199,8 +187,8 @@ int main(int argc, char* argv[]) {
 				bloom_free(filter);
 				return 0;
 			}
-			double delta = fpp_after-fpp_before;
-			//double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)n_rounds);
+			float delta = fpp_after-fpp_before;
+			//float ideal_fpp = calculate_ideal_fpp((float)2,(float)filter_size,(float)n_rounds);
 
 			if (delta > *delta_max){
 				strncpy(best_element,element,8);
@@ -209,7 +197,7 @@ int main(int argc, char* argv[]) {
 			bloom_remove(filter,element);
 
 		}
-		printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
+		//printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
 		//printf("%s%s\n", "el elemento insertado es:",best_element);
 		bloom_add(filter,best_element);
 		free(best_element);
@@ -219,17 +207,17 @@ int main(int argc, char* argv[]) {
 
 	clock_t end = clock();
 
-	double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
+	float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
 	printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 	filter_dump(filter);
 	char** random_vector = generate_random_vector(vectorLen_f);
-	double final_fpp = measure_fpp(random_vector, vectorLen_f);
+	float final_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
 	bloom_free(filter);
 
 	FILE *fp;
 	fp = fopen("results.txt","a");
-	fprintf(fp,"%s\n","t,n,m,k,fpp,time");
+	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
 	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
 
 	return 0;

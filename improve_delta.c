@@ -7,10 +7,10 @@
 #include <time.h>
 #include <openssl/sha.h>
 
-
 bloom_t filter;
 int vectorLen_f;
 int vectorLen_t;
+unsigned int seed=0;
 
 struct t_fpp {
 	size_t position;
@@ -96,10 +96,9 @@ char ** generate_random_vector(int length) {
 	for (int i = 0; i < length; i++)
 		vector[i] = malloc(8 * sizeof(char));
 
+	srand((unsigned int) seed);
+	seed++;
 
-	//srand((unsigned int) time (NULL));
-	//char f [vectorLen][8];
-	//printf("%s%d%s","Se genera el vector aleatorio con ", vectorLen_f, " posiciones de 64 bits cada una.\n");
 	for (int i = 0; i < length; i++){
 
 		char element[8];
@@ -121,6 +120,8 @@ int main(int argc, char* argv[]) {
 	int n_rounds = atoi(argv[3]);
 	size_t filter_size = atoi(argv[4]);
     size_t number_of_hashes = atoi(argv[5]);
+	char*results_file=argv[6];
+
 
    	filter = bloom_create(filter_size);
 
@@ -221,7 +222,7 @@ int main(int argc, char* argv[]) {
 	bloom_free(filter);
     free(f);
     FILE *fp;
-	fp = fopen("results_improve_delta.txt","a");
+	fp = fopen(results_file,"a");
 	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
 	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
 	fclose(fp);

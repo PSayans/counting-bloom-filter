@@ -11,15 +11,16 @@
 bloom_t filter;
 int vectorLen_f;
 int vectorLen_t;
+unsigned int seed=0;
 
 struct t_fpp {
 	size_t position;
-	float fpp;
+	double fpp;
 	struct t_fpp* next;
 };
 
 
-float calculate_ideal_fpp(float k, float m, float n){
+double calculate_ideal_fpp(double k, double m, double n){
 
 	//return pow(1 - exp(-k / (m/n)),k);
 	return pow(n*k/m,k);
@@ -74,7 +75,7 @@ float calculate_ideal_fpp(float k, float m, float n){
 	return hash;
  }
 
-float measure_fpp (char** f, int vectorLen) {
+double measure_fpp (char** f, int vectorLen) {
 	int fpp_counter=0;
 
 	for (int i=0; i<vectorLen; i++){
@@ -83,7 +84,7 @@ float measure_fpp (char** f, int vectorLen) {
 
 		}
 	}
-	float f_fpp = ((float) fpp_counter / vectorLen);
+	double f_fpp = ((double) fpp_counter / vectorLen);
 
 	return f_fpp;
 }
@@ -96,17 +97,15 @@ char ** generate_random_vector(int length) {
 	for (int i = 0; i < length; i++)
 		vector[i] = malloc(8 * sizeof(char));
 
+	srand((unsigned int) seed);
+	seed++;
 
-	srand((unsigned int) time (NULL));
-	//printf("%s%d%s","Se genera el vector aleatorio con ", vectorLen_f, " posiciones de 64 bits cada una.\n");
 	for (int i = 0; i < length; i++){
-
 		char element[8];
 		for (int k=0;k<8;k++){
 			element[k]=random();
 		}
 		strncpy(vector[i],element,8);
-		//printf("%s%d%s%s%s","el contenido del array random en pos", i, " es:",f[i],"\n");
 	}
 
 	return vector;
@@ -120,6 +119,7 @@ int main(int argc, char* argv[]) {
 	int n_rounds = atoi(argv[3]);
 	size_t filter_size = atoi(argv[4]);
     size_t number_of_hashes = atoi(argv[5]);
+	char*results_file=argv[6];
 
    	filter = bloom_create(filter_size);
 
@@ -159,14 +159,14 @@ int main(int argc, char* argv[]) {
 	clock_t begin=clock();
 	while (rounds_counter < n_rounds){
 		
-		float *delta_max = malloc(sizeof(float));
-		float aux = 0;
+		double *delta_max = malloc(sizeof(double));
+		double aux = 0;
 		delta_max = &aux;
-		float fpp_after;
+		double fpp_after;
 
 		char * best_element=malloc(8);
 		char ** t;
-		float fpp_before = measure_fpp(f, vectorLen_f);
+		double fpp_before = measure_fpp(f, vectorLen_f);
 		
 		//we generate a random set of elements T
 		//generamos el vector T
@@ -182,13 +182,24 @@ int main(int argc, char* argv[]) {
 			bloom_add(filter, element);
 			fpp_after = measure_fpp(f, vectorLen_f);
 			if (fpp_before >= 1){
+				clock_t end = clock();
 				printf("Filtro polucionado\n");
+				double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
+				printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 				filter_dump(filter);
+				char** random_vector = generate_random_vector(vectorLen_f);
+				double final_fpp = measure_fpp(random_vector, vectorLen_f);
+				printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", fpp_before," en la ronda ",rounds_counter, "\n");
 				bloom_free(filter);
+				FILE *fp;
+				fp = fopen(results_file,"a");
+				//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
+				fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
+				fclose(fp);
 				return 0;
 			}
-			float delta = fpp_after-fpp_before;
-			//float ideal_fpp = calculate_ideal_fpp((float)2,(float)filter_size,(float)n_rounds);
+			double delta = fpp_after-fpp_before;
+			//double ideal_fpp = calculate_ideal_fpp((double)2,(double)filter_size,(double)n_rounds);
 
 			if (delta > *delta_max){
 				strncpy(best_element,element,8);
@@ -207,18 +218,18 @@ int main(int argc, char* argv[]) {
 
 	clock_t end = clock();
 
-	float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
+	double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
 	printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 	filter_dump(filter);
 	char** random_vector = generate_random_vector(vectorLen_f);
-	float final_fpp = measure_fpp(random_vector, vectorLen_f);
+	double final_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
 	bloom_free(filter);
 
 	FILE *fp;
-	fp = fopen("results.txt","a");
+	fp = fopen(results_file,"a");
 	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
 	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
-
+	fclose(fp);
 	return 0;
 }

@@ -10,6 +10,7 @@
 bloom_t filter;
 int vectorLen_f;
 int vectorLen_t;
+unsigned int seed = 0;
 
 struct t_fpp {
 	int filter_size;
@@ -154,6 +155,9 @@ char ** generate_random_vector(int length) {
 	for (int i = 0; i < length; i++)
 		vector[i] = malloc(8 * sizeof(char));
 
+	srand((unsigned int) seed);
+	seed++;
+
 	for (int i = 0; i < length; i++){
 
 		char element[8]="";
@@ -161,7 +165,6 @@ char ** generate_random_vector(int length) {
 			element[k]=random();
 		}
 		strncat(vector[i],element,8);
-		//printf("%s%d%s%s%s","el contenido del array random en pos", i, " es:",f[i],"\n");
 	}
 
 	return vector;
@@ -175,12 +178,30 @@ int main(int argc, char* argv[]) {
 	int n_rounds = atoi(argv[3]);
 	size_t filter_size = atoi(argv[4]);
 	int lookup_rounds=atoi(argv[5]);
+	size_t number_of_hashes = atoi(argv[6]);
+	char*results_file=argv[7];
 
 	//printf("%f\n",ideal_fpp);
 
 	filter = bloom_create(filter_size);
-	bloom_add_hash(filter,md5);
-	bloom_add_hash(filter,md5);
+	
+	if (number_of_hashes ==2) {
+        bloom_add_hash(filter,md5);
+	    bloom_add_hash(filter,md5);
+    }
+
+	else if (number_of_hashes ==3){
+        bloom_add_hash(filter,md5);
+	    bloom_add_hash(filter,md5);
+        bloom_add_hash(filter,sha1);
+    }
+
+    else if (number_of_hashes ==4){
+        bloom_add_hash(filter,md5);
+	    bloom_add_hash(filter,md5);
+        bloom_add_hash(filter,sha1);
+        bloom_add_hash(filter,sha1);
+    }
 
 	char ** f = generate_random_vector(vectorLen_f);
 
@@ -190,17 +211,6 @@ int main(int argc, char* argv[]) {
 	
 	//leer el dataset de fpps
 	struct t_fpp* list = load_fpps("fpp.txt");
-
-	//calcular el FPP de este vector sobre un filtro vacio
-	//el FPP se calcula midiendo el total de matches/número de elementos probados
-		/* for n iteraciones:
-		-generar vector aleatorio de longitud X
-		-insertar elemento
-		-calcular delta
-		-comparar con el mejor delta existente
-		-si es mejor que el mejor se convierte en el nuevo mejor
-		-eliminamos el elemento
-	*/
 
 	/*------------------Inicio Algoritmo Lookup-----------------*/
 
@@ -361,7 +371,6 @@ int main(int argc, char* argv[]) {
 	free(f);
     FILE *fp;
 	fp = fopen("results_prediction.txt","a");
-	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
 	fprintf(fp,"%d%s%d%s%d%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
 	fclose(fp);
 	return 0;

@@ -1,0 +1,72 @@
+ejecutando lookup con args 500 100 y 2
+Vector F generado.
+Tiempo de ejecución: 109.296521 segundos
+El FPP para el vector Z al final de la ejecución es:0.014600 en la ronda 100
+ejecutando lookup con args 500 200 y 2
+Vector F generado.
+Tiempo de ejecución: 228.872462 segundos
+El FPP para el vector Z al final de la ejecución es:0.034200 en la ronda 200
+ejecutando lookup con args 500 300 y 2
+Vector F generado.
+Tiempo de ejecución: 356.538258 segundos
+El FPP para el vector Z al final de la ejecución es:0.067900 en la ronda 300
+ejecutando lookup con args 500 400 y 2
+Vector F generado.
+Tiempo de ejecución: 498.714407 segundos
+El FPP para el vector Z al final de la ejecución es:0.113100 en la ronda 400
+ejecutando lookup con args 500 500 y 2
+Vector F generado.
+Tiempo de ejecución: 636.419695 segundos
+El FPP para el vector Z al final de la ejecución es:0.152600 en la ronda 500
+ejecutando lookup con args 500 600 y 2
+Vector F generado.
+Tiempo de ejecución: 801.041950 segundos
+El FPP para el vector Z al final de la ejecución es:0.218200 en la ronda 600
+ejecutando lookup con args 500 100 y 3
+Vector F generado.
+Tiempo de ejecución: 115.402853 segundos
+El FPP para el vector Z al final de la ejecución es:0.006600 en la ronda 100
+ejecutando lookup con args 500 200 y 3
+Vector F generado.
+Tiempo de ejecución: 247.252704 segundos
+El FPP para el vector Z al final de la ejecución es:0.021100 en la ronda 200
+ejecutando lookup con args 500 300 y 3
+Vector F generado.
+Tiempo de ejecución: 396.667575 segundos
+El FPP para el vector Z al final de la ejecución es:0.051000 en la ronda 300
+ejecutando lookup con args 500 400 y 3
+Vector F generado.
+Tiempo de ejecución: 565.663428 segundos
+El FPP para el vector Z al final de la ejecución es:0.092700 en la ronda 400
+ejecutando lookup con args 500 500 y 3
+Vector F generado.
+Tiempo de ejecución: 762.947949 segundos
+El FPP para el vector Z al final de la ejecución es:0.149400 en la ronda 500
+ejecutando lookup con args 500 600 y 3
+Vector F generado.
+Tiempo de ejecución: 957.976104 segundos
+El FPP para el vector Z al final de la ejecución es:0.206800 en la ronda 600
+ejecutando lookup con args 500 100 y 4
+Vector F generado.
+Tiempo de ejecución: 117.935098 segundos
+El FPP para el vector Z al final de la ejecución es:0.005200 en la ronda 100
+ejecutando lookup con args 500 200 y 4
+Vector F generado.
+Tiempo de ejecución: 259.629886 segundos
+El FPP para el vector Z al final de la ejecución es:0.014700 en la ronda 200
+ejecutando lookup con args 500 300 y 4
+Vector F generado.
+Tiempo de ejecución: 439.821501 segundos
+El FPP para el vector Z al final de la ejecución es:0.044700 en la ronda 300
+ejecutando lookup con args 500 400 y 4
+Vector F generado.
+Tiempo de ejecución: 642.872398 segundos
+El FPP para el vector Z al final de la ejecución es:0.102000 en la ronda 400
+ejecutando lookup con args 500 500 y 4
+Vector F generado.
+Tiempo de ejecución: 877.298456 segundos
+El FPP para el vector Z al final de la ejecución es:0.172300 en la ronda 500
+ejecutando lookup con args 500 600 y 4
+Vector F generado.
+Tiempo de ejecución: 1128.425290 segundos
+El FPP para el vector Z al final de la ejecución es:0.242500 en la ronda 600

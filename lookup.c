@@ -165,7 +165,6 @@ int main(int argc, char* argv[]) {
 		double aux = 0;
 		delta_max = &aux;
 		double fpp_after;
-
 		char * best_element=malloc(8);
 		char ** t;
 		double fpp_before = measure_fpp(f, vectorLen_f);
@@ -215,6 +214,7 @@ int main(int argc, char* argv[]) {
 		}
 		bloom_add(filter,best_element);
 		destroy_random_vector(t, vectorLen_t);
+		free(delta_max);
 		rounds_counter++;
 	}
 

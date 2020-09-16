@@ -3,11 +3,10 @@
 t_optimo=50
 
 file=results/t_resuls.txt
-rm $file
 #pruebas para calcular T
-for x in 10 20 50 100 200 
+for x in 200 
     do
-    for y in 2 3 4
+    for y in 3 4
         do
         for z in {100..600..100}
         do
@@ -16,7 +15,7 @@ for x in 10 20 50 100 200
         done
     done
 done
-
+exit
 rm results_prediction.txt
 #pruebas para ambos algoritmos
 for n in 10 20 50 100 200 500 600 do

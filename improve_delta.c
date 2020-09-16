@@ -144,9 +144,6 @@ int main(int argc, char* argv[]) {
     }
 
 	char ** f = generate_random_vector(vectorLen_f);
-
-	printf("Vector F generado.\n");
-
 	int rounds_counter = 0;
 
 	clock_t begin=clock();
@@ -203,7 +200,7 @@ int main(int argc, char* argv[]) {
             best_delta = *delta_max;      
             inserted=false;
         }
-		printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
+		//printf("%s%f%s%d%s", "El FPP para el vector F es:", fpp_after," en la ronda ",rounds_counter, "\n");
 		//printf("%s%s\n", "el elemento insertado es:",best_element);
 		bloom_add(filter,best_element);
 		free(best_element);

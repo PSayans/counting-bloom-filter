@@ -44,7 +44,7 @@ double calculate_ideal_fpp(double k, double m, double n){
 			hash  = hash | ((uint64_t)digest[i] << (8*i)); 
 		}
 	}
-	else {
+	else if (round == 1){
 		for (int i = 8; i<16; i++) {
 			//hash = hash + digest[i];
 			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));
@@ -61,17 +61,18 @@ double calculate_ideal_fpp(double k, double m, double n){
 	
 	SHA1(_str,length,digest);
 	uint64_t hash=0;
-	if (round == 3){
+	if (round == 2){
 		for (int i = 0; i<8; i++) {
 			hash  = hash | ((uint64_t)digest[i] << (8*i)); 
 		}
 	}
-	else {
+	else if (round == 3){
 		for (int i = 8; i<16; i++) {
 			//hash = hash + digest[i];
 			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));
 		}
 	}
+	//printf("%s%zu%s%d%s","Valor de retorno del hash:",hash," en ronda:",round,"\n");
 	return hash;
  }
 
@@ -128,7 +129,7 @@ int main(int argc, char* argv[]) {
 	    bloom_add_hash(filter,md5);
     }
 
-	else if (number_of_hashes ==3){
+	else if (number_of_hashes == 3){
         bloom_add_hash(filter,md5);
 	    bloom_add_hash(filter,md5);
         bloom_add_hash(filter,sha1);
@@ -141,8 +142,6 @@ int main(int argc, char* argv[]) {
         bloom_add_hash(filter,sha1);
     }
 	char ** f = generate_random_vector(vectorLen_f);
-
-	printf("Vector F generado.\n");
 
 	//calcular el FPP de este vector sobre un filtro vacio
 	//el FPP se calcula midiendo el total de matches/número de elementos probados

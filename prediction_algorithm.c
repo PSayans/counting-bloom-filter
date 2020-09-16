@@ -129,6 +129,17 @@ float calculate_ideal_fpp(float k, float m, float n){
 	for (int i = 0; i<8; i++) {
 		hash  = hash | ((uint64_t)digest[i] << (8*i)); 
 	}
+	if (round == 2){
+		for (int i = 0; i<8; i++) {
+			hash  = hash | ((uint64_t)digest[i] << (8*i)); 
+		}
+	}
+	else if (round == 3){
+		for (int i = 8; i<16; i++) {
+			//hash = hash + digest[i];
+			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));
+		}
+	}
 	return hash;
  }
 

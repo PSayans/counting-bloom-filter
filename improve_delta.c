@@ -60,12 +60,12 @@ double calculate_ideal_fpp(double k, double m, double n){
 	
 	SHA1(_str,length,digest);
 	uint64_t hash=0;
-	if (round == 0){
+	if (round == 2){
 		for (int i = 0; i<8; i++) {
 			hash  = hash | ((uint64_t)digest[i] << (8*i)); 
 		}
 	}
-	else {
+	else if (round == 3){
 		for (int i = 8; i<16; i++) {
 			//hash = hash + digest[i];
 			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));

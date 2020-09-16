@@ -2,13 +2,13 @@
 
 t_optimo=50
 
-file=results/t_resuls.txt
+file=results/t_resuls_2.txt
 #pruebas para calcular T
-for x in 200 
+for x in 100 200
     do
-    for y in 3 4
+    for y in 2 3 4
         do
-        for z in {100..600..100}
+        for z in {100..200..100}
         do
         echo "ejecutando lookup con args $x $z y $y"
         ./lookup 10000 $x $z 2048 $y $file

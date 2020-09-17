@@ -8,8 +8,6 @@
 #include <openssl/sha.h>
 
 bloom_t filter;
-int vectorLen_f;
-int vectorLen_t;
 unsigned int seed_t;
 unsigned int seed_f;
 
@@ -74,11 +72,9 @@ float measure_fpp (char** f, int vectorLen) {
 	for (int i=0; i<vectorLen; i++){
 		if (bloom_test(filter,f[i])){
 			fpp_counter++;
-
 		}
 	}
 	float f_fpp = ((float) fpp_counter / vectorLen);
-
 	return f_fpp;
 }
 
@@ -125,11 +121,12 @@ void destroy_random_vector(char** vector, int lenght){
 }
 
 int main(int argc, char* argv[]) {
-	seed_f=0;
+	seed_f=30000;
 	seed_t=0;
 	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
-	vectorLen_f = atoi(argv[1]);
-	vectorLen_t = atoi(argv[2]);
+	
+	int vectorLen_f = atoi(argv[1]);
+	int vectorLen_t = atoi(argv[2]);
 	int n_rounds = atoi(argv[3]);
 	size_t filter_size = atoi(argv[4]);
     size_t number_of_hashes = atoi(argv[5]);
@@ -154,12 +151,11 @@ int main(int argc, char* argv[]) {
         bloom_add_hash(filter,sha1);
         bloom_add_hash(filter,sha1);
     }
-	char ** f = generate_random_vector(vectorLen_f,'f');
 	int rounds_counter = 0;
+	char ** f = generate_random_vector(vectorLen_f,'f');
 
 	clock_t begin=clock();
 	while (rounds_counter < n_rounds){
-		
 		
 		float delta_max = 0;
 		float fpp_after;
@@ -214,6 +210,7 @@ int main(int argc, char* argv[]) {
 		}
 		bloom_add(filter,best_element);
 		destroy_random_vector(t, vectorLen_t);
+		//destroy_random_vector(f,vectorLen_f);
 		rounds_counter++;
 	}
 

@@ -7,9 +7,8 @@ fi
 
 t_optimo=50
 
-file=results/t_resuls_good_random.txt
-
 if [ $1 = "1" ]; then
+    file=results/t_resuls_good_random.txt
     #pruebas para calcular T
     for x in 10 20 50 100 200 500
         do
@@ -17,7 +16,7 @@ if [ $1 = "1" ]; then
             do
             for z in {100..600..100}
             do
-            echo "ejecutando lookup con args $x $z y $y"
+            echo "./lookup.o 10000 $x $z 2048 $y $file"
             ./lookup.o 10000 $x $z 2048 $y $file
             done
         done

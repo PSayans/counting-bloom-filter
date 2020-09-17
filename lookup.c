@@ -13,7 +13,7 @@ int vectorLen_t;
 unsigned int seed_t;
 unsigned int seed_f;
 
-double calculate_ideal_fpp(double k, double m, double n){
+float calculate_ideal_fpp(float k, float m, float n){
 
 	//return pow(1 - exp(-k / (m/n)),k);
 	return pow(n*k/m,k);
@@ -68,7 +68,7 @@ double calculate_ideal_fpp(double k, double m, double n){
 	return hash;
  }
 
-double measure_fpp (char** f, int vectorLen) {
+float measure_fpp (char** f, int vectorLen) {
 	int fpp_counter=0;
 
 	for (int i=0; i<vectorLen; i++){
@@ -77,7 +77,7 @@ double measure_fpp (char** f, int vectorLen) {
 
 		}
 	}
-	double f_fpp = ((double) fpp_counter / vectorLen);
+	float f_fpp = ((float) fpp_counter / vectorLen);
 
 	return f_fpp;
 }
@@ -161,13 +161,12 @@ int main(int argc, char* argv[]) {
 	while (rounds_counter < n_rounds){
 		
 		
-		double *delta_max = malloc(sizeof(double));
-		double aux = 0;
-		delta_max = &aux;
-		double fpp_after;
+		float delta_max = 0;
+		float fpp_after;
+
 		char * best_element=malloc(8);
 		char ** t;
-		double fpp_before = measure_fpp(f, vectorLen_f);
+		float fpp_before = measure_fpp(f, vectorLen_f);
 		
 		//we generate a random set of elements T
 		//generamos el vector T
@@ -175,7 +174,7 @@ int main(int argc, char* argv[]) {
 		
 		t = generate_random_vector(vectorLen_t,'t');
 
-		/*if (rounds_counter%100==0){
+		/*if (rounds_counter%5==0){
 			destroy_random_vector(f,vectorLen_f);
 			f = generate_random_vector(vectorLen_f,'f');
 		}*/
@@ -190,11 +189,11 @@ int main(int argc, char* argv[]) {
 			if (fpp_before >= 1){
 				clock_t end = clock();
 				printf("Filtro polucionado\n");
-				double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
+				float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
 				printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 				filter_dump(filter);
 				char** random_vector = generate_random_vector(vectorLen_f,'f');
-				double final_fpp = measure_fpp(random_vector, vectorLen_f);
+				float final_fpp = measure_fpp(random_vector, vectorLen_f);
 				printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", fpp_before," en la ronda ",rounds_counter, "\n");
 				bloom_free(filter);
 				FILE *fp;
@@ -204,27 +203,27 @@ int main(int argc, char* argv[]) {
 				fclose(fp);
 				return 0;
 			}
-			double delta = fpp_after-fpp_before;
+			float delta = fpp_after-fpp_before;
 
-			if (delta > *delta_max){
+			if (delta > delta_max){
 				strncpy(best_element,element,8);
-				*delta_max=delta;
+				delta_max=delta;
 			}
 			bloom_remove(filter,element);
+			//printf("%s%d%s%fl%s", "El FPP para la ronda: ", rounds_counter," es ",fpp_after, "\n");
 		}
 		bloom_add(filter,best_element);
 		destroy_random_vector(t, vectorLen_t);
-		free(delta_max);
 		rounds_counter++;
 	}
 
 	clock_t end = clock();
 
-	double time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
+	float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
 	printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 	filter_dump(filter);
-	char** random_vector = generate_random_vector(vectorLen_f,'r');
-	double final_fpp = measure_fpp(random_vector, vectorLen_f);
+	char** random_vector = generate_random_vector(vectorLen_f, 'r');
+	float final_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
 	bloom_free(filter);
 

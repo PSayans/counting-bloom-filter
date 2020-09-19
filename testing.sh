@@ -26,7 +26,7 @@ fi
 
 if [ $1 = "2" ]; then
     #pruebas para ambos algoritmos
-    for n in 10 20 50 100 200 500 600 
+    for n in {100..600..100} 
     do
         for m in 2048 3072 4096 5120 
         do
@@ -43,7 +43,7 @@ fi
 if [ $1 = "3" ]; then
     file=improve_delta_results.txt
     #pruebas para ambos algoritmos
-    for n in 10 20 50 100 200 500 600 
+    for n in {100..600..100} 
     do
         for m in 2048 3072 4096 5120 
         do
@@ -58,7 +58,7 @@ if [ $1 = "3" ]; then
 fi
 if [ $1 = "4" ]; then
     #pruebas para ambos algoritmos
-    for n in 100 200 500 600
+    for n in {100..600..100}
     do
         lookup_rounds=$(expr $n / 2)
         echo $lookup_rounds

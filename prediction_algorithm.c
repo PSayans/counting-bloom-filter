@@ -297,7 +297,7 @@ int main(int argc, char* argv[]) {
 
 	/*------------------Fin Algoritmo Lookup-----------------*/
 	destroy_random_vector(f,vectorLen_f);
-	char** random_vector = generate_random_vector(vectorLen_f,'r');
+	char** random_vector = generate_random_vector(30000,'r');
 	float final_lookup_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_lookup_fpp," en la ronda ",rounds_counter, "\n");
 	struct t_fpp p_predicted_filter = predict_filter_type(final_lookup_fpp,list);
@@ -374,7 +374,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	/*------------------Fin Algoritmo fpp ideal-----------------*/
-
 
 	clock_t end = clock();
 

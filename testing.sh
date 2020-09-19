@@ -63,8 +63,8 @@ do
     do
         for k in 2 3 4 
         do
-            echo "ejecutando algoritmo prediccion con args $n $m y $k"
-            ./prediction_algorithm.o 10000 $t_optimo $n $m $k 
+            echo "./improve_delta.o 10000 $t_optimo $n $m $k $2"
+                ./prediction_algorithm.o 10000 $t_optimo $n $m $k $2
         done
     done
 done

@@ -341,10 +341,10 @@ int main(int argc, char* argv[]) {
 			bloom_add(filter, element);
 			fpp_after = measure_fpp(f, vectorLen_f);
 			if (fpp_after >= 1){
-				break;
 				printf("Filtro polucionado\n");
 				rounds_counter=n_rounds;
-				return 0;
+				break;
+
 			}
 			float delta=fpp_after-fpp_before;
 			//printf("%f\n",ideal_fpp);

@@ -56,15 +56,22 @@ if [ $1 = "3" ]; then
     done
     exit
 fi
-#pruebas para ambos algoritmos
-for n in 10 20 50 100 200 500 600 
-do
-    for m in 2048 3072 4096 5120 
+if [ $1 = "4" ]; then
+    #pruebas para ambos algoritmos
+    for n in 100 200 500 600
     do
-        for k in 2 3 4 
+        lookup_rounds=$(expr $n / 2)
+        echo $lookup_rounds
+        echo "./fpp_generator.o 3 $lookup_rounds 4096 query 1024 10000 5"
+        ./fpp_generator.o 3 $n 4096 dataset 1024 10000 5
+        for m in 2048 3072 4096 5120 
         do
-            echo "./improve_delta.o 10000 $t_optimo $n $m $k $2"
-                ./prediction_algorithm.o 10000 $t_optimo $n $m $k $2
+            for k in 2 3 4 
+            do
+                echo "./prediction_algorithm.o 10000 $t_optimo $n $m $k $2"
+                    ./prediction_algorithm.o 10000 $t_optimo $n $m $lookup_rounds $k $2
+            done
         done
     done
-done
+    exit
+fi

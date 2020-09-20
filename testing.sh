@@ -67,6 +67,9 @@ if [ $1 = "4" ]; then
         do
             for k in 2 3 4 
             do
+                if [ $lookup_rounds -gt 100 ]; then
+                    lookup_rounds=100
+                fi
                 echo "./prediction_algorithm.o 10000 $t_optimo $n $m $lookup_rounds $k $2"
                     ./prediction_algorithm.o 10000 $t_optimo $n $m $lookup_rounds $k $2
             done

@@ -63,12 +63,12 @@ if [ $1 = "4" ]; then
         lookup_rounds=$(expr $n / 2)
         echo $lookup_rounds
         echo "./fpp_generator.o 3 $lookup_rounds 4096 query 1024 10000 5"
-        ./fpp_generator.o 3 $n 4096 dataset 1024 10000 5
+        ./fpp_generator.o 2 $lookup_rounds 1024 dataset 1024 10000 5
         for m in 2048 3072 4096 5120 
         do
             for k in 2 3 4 
             do
-                echo "./prediction_algorithm.o 10000 $t_optimo $n $m $k $2"
+                echo "./prediction_algorithm.o 10000 $t_optimo $n $m $lookup_rounds $k $2"
                     ./prediction_algorithm.o 10000 $t_optimo $n $m $lookup_rounds $k $2
             done
         done

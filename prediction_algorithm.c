@@ -8,8 +8,8 @@
 
 
 bloom_t filter;
-int vectorLen_f;
-int vectorLen_t;
+unsigned int vectorLen_f;
+unsigned int vectorLen_t;
 unsigned int seed_f, seed_t;
 
 struct t_fpp {
@@ -59,35 +59,32 @@ struct t_fpp* load_fpps(char* path){
 	return first;
 }
 
-struct t_fpp predict_filter_type(float fpp, struct t_fpp* list){
+struct t_fpp* predict_filter_type(float fpp, struct t_fpp* list){
 
 	struct t_fpp* last=list;
-	struct t_fpp best_node;
+	struct t_fpp* best_node;
 	float best_delta=fabs(fpp-last->fpp);
+	best_node=last;
 	float delta;
 
 	while(last->next != NULL){
 		delta=fabs(fpp-last->fpp);
-		printf("%s%fl\n","Diferencia:",delta);
 		if (delta<best_delta){
 			best_delta=delta;
-			best_node=*last;
+			best_node=last;
 		}
 		last= last->next;
 	}
-	printf("%s%fl\n","Contenido del FPP:",last->fpp);
 	delta=fabs(fpp-last->fpp);
-	printf("%s%fl\n","Diferencia:",delta);
 	if (delta<best_delta){
 		best_delta=delta;
-		best_node=*last;
+		best_node=last;
 	}
 	return best_node;
 }
 
 
 float calculate_ideal_fpp(float k, float m, float n){
-
 	return pow((n*k)/m,k);
 }
 
@@ -142,10 +139,10 @@ float calculate_ideal_fpp(float k, float m, float n){
 	return hash;
  }
 
-float measure_fpp (char** f, int vectorLen) {
+float measure_fpp (char** f, unsigned int vectorLen) {
 	int fpp_counter=0;
 
-	for (int i=0; i<vectorLen; i++){
+	for (unsigned int i=0; i<vectorLen; i++){
 		if (bloom_test(filter,f[i])){
 			fpp_counter++;
 
@@ -156,12 +153,12 @@ float measure_fpp (char** f, int vectorLen) {
 	return f_fpp;
 }
 
-char ** generate_random_vector(int length, char vector_type) {
+char ** generate_random_vector(unsigned int length, char vector_type) {
 	char ** vector;
 
 	vector = malloc(length * sizeof(char*));
 
-	for (int i = 0; i < length; i++)
+	for (unsigned int i = 0; i < length; i++)
 		vector[i] = malloc(8 * sizeof(unsigned char));
 
 	if (vector_type=='t'){
@@ -176,7 +173,7 @@ char ** generate_random_vector(int length, char vector_type) {
 		srand((unsigned int) time(NULL));
 	}
 
-	for (int i = 0; i < length; i++){
+	for (unsigned int i = 0; i < length; i++){
 		unsigned char element[8];
 		for (int k=0;k<8;k=k+4){
 			unsigned int ran=(unsigned int)random();
@@ -191,8 +188,8 @@ char ** generate_random_vector(int length, char vector_type) {
 	return vector;
 }
 
-void destroy_random_vector(char** vector, int lenght){
-	for(int i=0; i<lenght;i++){
+void destroy_random_vector(char** vector, unsigned int lenght){
+	for(unsigned int i=0; i<lenght;i++){
 			free(vector[i]);
 		} 
 	free(vector);
@@ -201,8 +198,8 @@ void destroy_random_vector(char** vector, int lenght){
 
 int main(int argc, char* argv[]) {
 
-	seed_t=1535;
-	seed_f=0;
+	seed_t=0;
+	seed_f=1535;
 	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
 	vectorLen_f = atoi(argv[1]);
 	vectorLen_t = atoi(argv[2]);
@@ -216,18 +213,18 @@ int main(int argc, char* argv[]) {
 
 	filter = bloom_create(filter_size);
 	
-	if (number_of_hashes ==2) {
+	if (number_of_hashes == 2) {
         bloom_add_hash(filter,md5);
 	    bloom_add_hash(filter,md5);
     }
 
-	else if (number_of_hashes ==3){
+	else if (number_of_hashes == 3){
         bloom_add_hash(filter,md5);
 	    bloom_add_hash(filter,md5);
         bloom_add_hash(filter,sha1);
     }
 
-    else if (number_of_hashes ==4){
+    else if (number_of_hashes == 4){
         bloom_add_hash(filter,md5);
 	    bloom_add_hash(filter,md5);
         bloom_add_hash(filter,sha1);
@@ -297,25 +294,23 @@ int main(int argc, char* argv[]) {
 
 	/*------------------Fin Algoritmo Lookup-----------------*/
 	destroy_random_vector(f,vectorLen_f);
-	char** random_vector = generate_random_vector(30000,'r');
-	float final_lookup_fpp = measure_fpp(random_vector, vectorLen_f);
-	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_lookup_fpp," en la ronda ",rounds_counter, "\n");
-	struct t_fpp p_predicted_filter = predict_filter_type(final_lookup_fpp,list);
-	struct t_fpp* predicted_filter = &p_predicted_filter;
-	printf("%s%d%s%d\n", "El filtro detectado corresponde a k=", predicted_filter->hash_number, ", m=", predicted_filter->filter_size);
 
+	char** random_vector1 = generate_random_vector(vectorLen_f,'f');
+	float final_lookup_fpp = measure_fpp(random_vector1, vectorLen_f);
+	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_lookup_fpp," en la ronda ",rounds_counter, "\n");
+	struct t_fpp* predicted_filter = predict_filter_type(final_lookup_fpp,list);
+	float predicted_hash_number = (float) predicted_filter->hash_number;
+	float predicted_filter_size = (float) predicted_filter->filter_size;
 	/*------------------Inicio Algoritmo fpp ideal-----------------*/
 
-	float ideal_fpp_before = calculate_ideal_fpp((float)predicted_filter->hash_number,(float)predicted_filter->filter_size,
+	float ideal_fpp_before = calculate_ideal_fpp(predicted_hash_number,predicted_filter_size,
 				(float)rounds_counter-1);
-
 	float ideal_fpp_after;
 	float fpp_before;
 	float fpp_after;
 	bool inserted= false;
 
 	//definimos un array con tantos elementos tenga K para comprobar las deltas
-
 
 	while (rounds_counter < n_rounds){
 			
@@ -377,9 +372,8 @@ int main(int argc, char* argv[]) {
 
 	clock_t end = clock();
 
-	destroy_random_vector(random_vector,vectorLen_f);
-	char** random_vector2 = generate_random_vector(vectorLen_f,'r');
-	float final_fpp = measure_fpp(random_vector2, vectorLen_f);
+	char** random_vector_final = generate_random_vector(vectorLen_f,'f');
+	float final_fpp = measure_fpp(random_vector_final, vectorLen_f);
 	float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
 	printf("%s%d%s%d\n", "El filtro detectado corresponde a k=", predicted_filter->hash_number, ", m=", predicted_filter->filter_size);
 	printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	

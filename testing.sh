@@ -61,7 +61,6 @@ if [ $1 = "4" ]; then
     for n in {100..600..100}
     do
         lookup_rounds=$(expr $n / 2)
-        echo $lookup_rounds
         echo "./fpp_generator.o 3 $lookup_rounds 4096 query 1024 10000 5"
         ./fpp_generator.o 2 $lookup_rounds 1024 dataset 1024 10000 5
         for m in 2048 3072 4096 5120 

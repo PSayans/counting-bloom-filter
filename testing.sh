@@ -10,14 +10,14 @@ t_optimo=50
 if [ $1 = "1" ]; then
     file=results/t_resuls_good_random.txt
     #pruebas para calcular T
-    for x in 10 20 50 100 200 500
+    for t in 10 20 50 100 200 500
         do
-        for y in 2 3 4
+        for k in 2 3 4
             do
-            for z in {100..600..100}
+            for n in {100..600..100}
             do
-            echo "./lookup.o 10000 $x $z 2048 $y $file"
-            ./lookup.o 10000 $x $z 2048 $y $file
+            echo "./lookup.o 10000 $t $n 2048 $k $file"
+            ./lookup.o 10000 $t $n 2048 $k $file
             done
         done
     done

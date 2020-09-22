@@ -80,7 +80,6 @@ float measure_fpp (char** f, int vectorLen) {
 
 char ** generate_random_vector(int length, char vector_type) {
 	char ** vector;
-
 	vector = malloc(length * sizeof(char*));
 
 	for (int i = 0; i < length; i++)
@@ -97,7 +96,7 @@ char ** generate_random_vector(int length, char vector_type) {
 	else{
 		srand((unsigned int) time(NULL));
 	}
-
+	
 	for (int i = 0; i < length; i++){
 		unsigned char element[8];
 		for (int k=0;k<8;k=k+4){
@@ -121,12 +120,13 @@ void destroy_random_vector(char** vector, int lenght){
 }
 
 int main(int argc, char* argv[]) {
+
 	seed_f=30000;
 	seed_t=0;
 	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
-	
+
 	int vectorLen_f = atoi(argv[1]);
-	int vectorLen_t = atoi(argv[2]);
+	int vectorLen_t;
 	int n_rounds = atoi(argv[3]);
 	size_t filter_size = atoi(argv[4]);
     size_t number_of_hashes = atoi(argv[5]);
@@ -153,6 +153,17 @@ int main(int argc, char* argv[]) {
     }
 	int rounds_counter = 0;
 	char ** f = generate_random_vector(vectorLen_f,'f');
+	int alfa = +atoi(argv[8]);
+	bool geometrico;
+
+	if (strncmp(argv[7],"geometrico",11)==0){
+		geometrico=true;
+		vectorLen_t=0;
+	}
+	else{
+		geometrico=false;
+		vectorLen_t = atoi(argv[2]);
+	}
 
 	clock_t begin=clock();
 	while (rounds_counter < n_rounds){
@@ -164,16 +175,14 @@ int main(int argc, char* argv[]) {
 		char ** t;
 		float fpp_before = measure_fpp(f, vectorLen_f);
 		
-		//we generate a random set of elements T
-		//generamos el vector T
-		//	rounds_counter, ".\n");
-		
-		t = generate_random_vector(vectorLen_t,'t');
+		if (!geometrico){
+			t = generate_random_vector(vectorLen_t,'t');
+		}
 
-		/*if (rounds_counter%5==0){
-			destroy_random_vector(f,vectorLen_f);
-			f = generate_random_vector(vectorLen_f,'f');
-		}*/
+		else {
+			vectorLen_t = rounds_counter + alfa;
+			t = generate_random_vector(vectorLen_t,'t');
+		}
 
 		best_element=t[0];
 		//aplicamos el algoritmo
@@ -183,21 +192,9 @@ int main(int argc, char* argv[]) {
 			bloom_add(filter, element);
 			fpp_after = measure_fpp(f, vectorLen_f);
 			if (fpp_before >= 1){
-				clock_t end = clock();
 				printf("Filtro polucionado\n");
-				float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
-				printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
-				filter_dump(filter);
-				char** random_vector = generate_random_vector(vectorLen_f,'f');
-				float final_fpp = measure_fpp(random_vector, vectorLen_f);
-				printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", fpp_before," en la ronda ",rounds_counter, "\n");
-				bloom_free(filter);
-				FILE *fp;
-				fp = fopen(results_file,"a");
-				//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
-				fprintf(fp,"%d%s%d%s%ld%s%ld%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
-				fclose(fp);
-				return 0;
+				rounds_counter=n_rounds;
+				break;
 			}
 			float delta = fpp_after-fpp_before;
 
@@ -209,25 +206,25 @@ int main(int argc, char* argv[]) {
 			//printf("%s%d%s%fl%s", "El FPP para la ronda: ", rounds_counter," es ",fpp_after, "\n");
 		}
 		bloom_add(filter,best_element);
-		destroy_random_vector(t, vectorLen_t);
-		//destroy_random_vector(f,vectorLen_f);
+		destroy_random_vector(t,vectorLen_t);
 		rounds_counter++;
 	}
 
 	clock_t end = clock();
-
+	
+	destroy_random_vector(f,vectorLen_f);
 	float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
 	printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 	filter_dump(filter);
-	char** random_vector = generate_random_vector(vectorLen_f, 'r');
+	char** random_vector = generate_random_vector(vectorLen_f, 't');
 	float final_fpp = measure_fpp(random_vector, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
 	bloom_free(filter);
 
 	FILE *fp;
 	fp = fopen(results_file,"a");
-	//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
-	fprintf(fp,"%d%s%d%s%ld%s%ld%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
+	fprintf(fp,"%d%s%d%s%ld%s%ld%s%s%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",
+		argv[7],",",alfa,",",final_fpp,",",time_spent);
 	fclose(fp);
 	return 0;
 }

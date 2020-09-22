@@ -266,8 +266,8 @@ int main(int argc, char* argv[]) {
 				float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
 				printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
 				filter_dump(filter);
-				char** random_vector = generate_random_vector(vectorLen_f,'f');
-				float final_fpp = measure_fpp(random_vector, vectorLen_f);
+				//char** random_vector = generate_random_vector(vectorLen_f,'f');
+				float final_fpp = measure_fpp(f, vectorLen_f);
 				printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", fpp_before," en la ronda ",rounds_counter, "\n");
 				bloom_free(filter);
 				FILE *fp;

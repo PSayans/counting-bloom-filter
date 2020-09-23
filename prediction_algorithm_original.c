@@ -1,7 +1,6 @@
 #include "bloom.h"
 #include <stdio.h>
 #include <openssl/md5.h>
-#include <openssl/sha.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -137,21 +136,6 @@ uint64_t sha1 (const void *_str, int round) {
 	//printf("%s%zu%s%d%s","Valor de retorno del hash:",hash," en ronda:",round,"\n");
 	return hash;
  }
-
-float measure_fpp (char** f, unsigned int vectorLen) {
-	int fpp_counter=0;
-
-	for (unsigned int i=0; i<vectorLen; i++){
-		if (bloom_test(filter,f[i])){
-			fpp_counter++;
-
-		}
-	}
-	float f_fpp = ((float) fpp_counter / vectorLen);
-
-	return f_fpp;
-}
-
 
 char ** generate_random_vector(unsigned int length, char vector_type) {
 	char ** vector;

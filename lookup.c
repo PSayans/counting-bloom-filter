@@ -40,7 +40,6 @@ float calculate_ideal_fpp(float k, float m, float n){
 			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));
 		}
 	}
-	//printf("%s%zu%s%d%s","Valor de retorno del hash:",hash," en ronda:",round,"\n");
 	return hash;
 }
 
@@ -145,7 +144,7 @@ int main(int argc, char* argv[]) {
         bloom_add_hash(filter,sha1);
     }
 
-    else if (number_of_hashes ==4){
+    else if (number_of_hashes == 4){
         bloom_add_hash(filter,md5);
 	    bloom_add_hash(filter,md5);
         bloom_add_hash(filter,sha1);
@@ -170,7 +169,6 @@ int main(int argc, char* argv[]) {
 		
 		float delta_max = 0;
 		float fpp_after;
-
 		char * best_element=malloc(8);
 		char ** t;
 		float fpp_before = measure_fpp(f, vectorLen_f);

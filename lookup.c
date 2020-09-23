@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
 	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
 
 	int vectorLen_f = atoi(argv[1]);
-	int vectorLen_t;
+	double vectorLen_t;
 	int n_rounds = atoi(argv[3]);
 	size_t filter_size = atoi(argv[4]);
     size_t number_of_hashes = atoi(argv[5]);
@@ -153,16 +153,16 @@ int main(int argc, char* argv[]) {
     }
 	int rounds_counter = 0;
 	char ** f = generate_random_vector(vectorLen_f,'f');
-	int alfa = +atoi(argv[8]);
+	double alfa = +atof(argv[8]);
 	bool geometrico;
 
 	if (strncmp(argv[7],"geometrico",11)==0){
 		geometrico=true;
-		vectorLen_t=0;
+		vectorLen_t=1;
 	}
 	else{
 		geometrico=false;
-		vectorLen_t = atoi(argv[2]);
+		vectorLen_t = atof(argv[2]);
 	}
 
 	clock_t begin=clock();
@@ -176,17 +176,17 @@ int main(int argc, char* argv[]) {
 		float fpp_before = measure_fpp(f, vectorLen_f);
 		
 		if (!geometrico){
-			t = generate_random_vector(vectorLen_t,'t');
+			t = generate_random_vector((int)vectorLen_t,'t');
 		}
 
 		else {
-			vectorLen_t = rounds_counter + alfa;
-			t = generate_random_vector(vectorLen_t,'t');
+			vectorLen_t = vectorLen_t + alfa;
+			t = generate_random_vector((int)vectorLen_t,'t');
 		}
 
 		best_element=t[0];
 		//aplicamos el algoritmo
-		for (int i =0; i < vectorLen_t; i++){
+		for (int i =0; i < (int)vectorLen_t; i++){
 			
 			char * element = t[i];
 			bloom_add(filter, element);
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
 			//printf("%s%d%s%fl%s", "El FPP para la ronda: ", rounds_counter," es ",fpp_after, "\n");
 		}
 		bloom_add(filter,best_element);
-		destroy_random_vector(t,vectorLen_t);
+		destroy_random_vector(t,(int)vectorLen_t);
 		rounds_counter++;
 	}
 
@@ -223,7 +223,7 @@ int main(int argc, char* argv[]) {
 
 	FILE *fp;
 	fp = fopen(results_file,"a");
-	fprintf(fp,"%d%s%d%s%ld%s%ld%s%s%s%d%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",
+	fprintf(fp,"%d%s%d%s%ld%s%ld%s%s%s%f%s%fl%s%fl\n", (int)vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",
 		argv[7],",",alfa,",",final_fpp,",",time_spent);
 	fclose(fp);
 	return 0;

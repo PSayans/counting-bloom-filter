@@ -11,12 +11,6 @@ bloom_t filter;
 unsigned int seed_t;
 unsigned int seed_f;
 
-float calculate_ideal_fpp(float k, float m, float n){
-
-	//return pow(1 - exp(-k / (m/n)),k);
-	return pow(n*k/m,k);
-}
-
 //bloom_add_hash(bloom,md5)
  uint64_t md5 (const void *_str, int round) {
 
@@ -189,6 +183,7 @@ int main(int argc, char* argv[]) {
 			char * element = t[i];
 			bloom_add(filter, element);
 			fpp_after = measure_fpp(f, vectorLen_f);
+
 			if (fpp_before >= 1){
 				printf("Filtro polucionado\n");
 				rounds_counter=n_rounds;

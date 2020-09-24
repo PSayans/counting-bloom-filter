@@ -77,3 +77,19 @@ if [ $1 = "4" ]; then
     done
     exit
 fi
+if [ $1 = "5" ]; then
+    #pruebas para ambos algoritmos
+    for n in {100..600..100}
+    do
+        lookup_rounds=500
+        for m in 2048 3072 4096 5120 
+        do
+            for k in 2 3 4 
+            do
+                echo "./prediction_algorithm_modified.o 10000 $t_optimo $n $m $lookup_rounds $k $2"
+                    ./prediction_algorithm_modified.o 10000 $t_optimo $n $m $lookup_rounds $k $2
+            done
+        done
+    done
+    exit
+fi

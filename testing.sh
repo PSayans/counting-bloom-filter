@@ -79,16 +79,13 @@ if [ $1 = "4" ]; then
 fi
 if [ $1 = "5" ]; then
     #pruebas para ambos algoritmos
-    for n in {100..600..100}
+    for m in 2048 3072 4096 5120 
     do
-        for m in 2048 3072 4096 5120 
+        for k in 2 3 4 
         do
-            for k in 2 3 4 
-            do
-                echo "./prediction_algorithm_modified.o 10000 $t_optimo 1200 $m $n $k $2"
-                    ./prediction_algorithm_modified.o 10000 $t_optimo 1200 $m $n $k $2
-            done
+            echo "./prediction_algorithm_modified.o 10000 $t_optimo 1500 $m 1000 $k $2"
+            ./prediction_algorithm_modified.o 10000 $t_optimo 1500 $m 1000 $k $2
         done
     done
-    exit
+  exit
 fi

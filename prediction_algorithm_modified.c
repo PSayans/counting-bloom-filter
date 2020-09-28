@@ -231,12 +231,11 @@ int main(int argc, char* argv[]) {
 	/*------------------Inicio Algoritmo Lookup-----------------*/
 
 	int rounds_counter = 0;
-	bool terminado = false;
 	float fpp_after;
 
 	clock_t begin=clock();
 
-	while (rounds_counter < lookup_rounds && terminado==false){
+	while (rounds_counter < lookup_rounds){
 		
 		char ** f = generate_random_vector(vectorLen_f,'f');
 		float fpp_before = measure_fpp(f, vectorLen_f);

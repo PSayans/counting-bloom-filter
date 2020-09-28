@@ -241,42 +241,42 @@ int main(int argc, char* argv[]) {
 	/*------------------Inicio Algoritmo Lookup-----------------*/
 
 	int rounds_counter = 0;
+	float fpp_after;
 	clock_t begin=clock();
+
 	while (rounds_counter < lookup_rounds){
 		
-		float delta_max = 0;
-		float fpp_after;
 
+		char ** f = generate_random_vector(vectorLen_f,'f');
+		float fpp_before = measure_fpp(f, vectorLen_f);
+
+		if (fpp_before>=0.1){
+			fpp_after=fpp_before;
+			destroy_random_vector(f,vectorLen_f);
+			break;
+		}
+
+		else if (fpp_before >= 1){
+			printf("Filtro polucionado\n");
+			fpp_after=fpp_before;
+			destroy_random_vector(f,vectorLen_f);
+			break;
+		}
+
+		float delta_max = 0;
 		char * best_element=malloc(8);
 		char ** t;
-		float fpp_before = measure_fpp(f, vectorLen_f);
-		
 		t = generate_random_vector(vectorLen_t,'t');
-
 		best_element=t[0];
+
+
 		//aplicamos el algoritmo
 		for (int i =0; i < vectorLen_t; i++){
 			
 			char * element = t[i];
 			bloom_add(filter, element);
 			fpp_after = measure_fpp(f, vectorLen_f);
-			if (fpp_before >= 1){
-				clock_t end = clock();
-				printf("Filtro polucionado\n");
-				float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
-				printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
-				filter_dump(filter);
-				//char** random_vector = generate_random_vector(vectorLen_f,'f');
-				float final_fpp = measure_fpp(f, vectorLen_f);
-				printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", fpp_before," en la ronda ",rounds_counter, "\n");
-				bloom_free(filter);
-				FILE *fp;
-				fp = fopen(results_file,"a");
-				//fprintf(fp,"%s\n","t,n,m,k,fpp,time");
-				fprintf(fp,"%d%s%d%s%ld%s%ld%s%fl%s%fl\n", vectorLen_t,",",n_rounds,",",filter_size,",",number_of_hashes,",",final_fpp,",",time_spent);
-				fclose(fp);
-				return 0;
-			}
+			
 			float delta = fpp_after-fpp_before;
 
 			if (delta > delta_max){
@@ -288,12 +288,11 @@ int main(int argc, char* argv[]) {
 		}
 		bloom_add(filter,best_element);
 		destroy_random_vector(t, vectorLen_t);
-		//destroy_random_vector(f,vectorLen_f);
+		destroy_random_vector(f,vectorLen_f);
 		rounds_counter++;
 	}
 
 	/*------------------Fin Algoritmo Lookup-----------------*/
-	destroy_random_vector(f,vectorLen_f);
 
 	char** random_vector1 = generate_random_vector(vectorLen_f,'f');
 	float final_lookup_fpp = measure_fpp(random_vector1, vectorLen_f);
@@ -307,7 +306,7 @@ int main(int argc, char* argv[]) {
 				(float)rounds_counter-1);
 	float ideal_fpp_after;
 	float fpp_before;
-	float fpp_after;
+	fpp_after=0;
 	bool inserted= false;
 
 	//definimos un array con tantos elementos tenga K para comprobar las deltas

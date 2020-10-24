@@ -288,7 +288,7 @@ int main(int argc, char* argv[]) {
 
 	char* command=calloc(100,sizeof(char));
 
-	snprintf(command, 100, "./fpp_generator.o 2 %d 2048 dataset 1024 10000 5", rounds_counter+1);
+	snprintf(command, 100, "./fpp_generator.o 2 %d 2048 dataset 1024 5120 5", rounds_counter+1);
 	system(command);
 	//leer el dataset de fpps
 	struct t_fpp* list = load_fpps("fpp.txt");

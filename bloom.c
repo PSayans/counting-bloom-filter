@@ -5,33 +5,31 @@
 #include "bloom.h"
 
 
-//lista enlazada que contiene los punteros a las funciones de hashing
+//linked list containing the pointers to the hashing functions
 struct bloom_hash {
     hash_function func;
     struct bloom_hash *next;
 };
 
 
-//estructura del propio BF con la lista de hashes, el array de bits (cambiar a integer) y el tamaño
+//BF struct with the list of hashesh, bit array and size
 struct bloom_filter {
     struct bloom_hash *func;
-    int32_t *counters; //cambiar a un puntero de enteros
+    int32_t *counters;
     size_t size;
 };
 
 
-//funcion que crea un filtro de tamaño size
+//creates a filter with specified size
 bloom_t bloom_create(size_t size) {
-	//puntero al comienzo del array de bloom_filters (que solo hay 1)
 	bloom_t res = calloc(1, sizeof(struct bloom_filter));
 	res->size = size;
-	//se reservan size bytes de memoria y se devuelve un puntero al principio
 	res->counters = calloc(size, sizeof(int32_t));
 	return res;
 }
 
 
-//funcion que libera la memoria para destruir el filtro filter
+//destroys the filter
 void bloom_free(bloom_t filter) {
 	if (filter) {
 		while (filter->func) {
@@ -44,7 +42,7 @@ void bloom_free(bloom_t filter) {
 	}
 }
 
-//funcion que añade una funcion de hashing func a la lista enlazada del filtro filter
+//adds hash function to the list of hashes of the filter
 void bloom_add_hash(bloom_t filter, hash_function func) {
 	struct bloom_hash *h = calloc(1, sizeof(struct bloom_hash));
 	h->func = func;
@@ -59,49 +57,35 @@ void bloom_add_hash(bloom_t filter, hash_function func) {
 	}
 }
 
-//funcion que añade un elemento item al filtro filter
+//adds an element to the filter passed by argument
 void bloom_add(bloom_t filter, const void *item) {
-
 	struct bloom_hash *h = filter->func;
-	//variable que contiene el vector m de contadores
 	int32_t *counters = filter->counters;
-	//se itera sobre las funciones de hashing
 	int i = 0;
 	while (h) {
-		//se obtiene el valor del hash
 		uint64_t hash = h->func(item,i);
-		//hash= hash % filter.size
 		hash = hash % (filter->size);
-		//printf("%s%ld%s%d\n","Se incrementa el contador de la posicion ",hash, " en la ronda ", i);
-		//se incrementa el contador
 		counters[hash] = counters[hash] + 1;
 		h = h->next;
 		i++;
 	}
 }
 
-//TODO: funcion que elimina el elemento item del filtro filter
+//removes an element from the filter
 void bloom_remove (bloom_t filter, const void *item) {
 	struct bloom_hash *h = filter->func;
-	//variable que contiene el vector m de contadores
 	int32_t *counters = filter->counters;
-	//se itera sobre las funciones de hashing
 	int i = 0;
 	while (h) {
-		//se obtiene el valor del hash
 		uint64_t hash = h->func(item,i);
-		//hash= hash % filter.size
 		hash = hash % (filter->size);
-		//se incrementa el contador
-		//printf("Se incrementa el contador de la posicion %d\n",hash);
 		counters[hash] = counters[hash] - 1;
 		h = h->next;
 		i++;
 	}
 }
 
-
-//funcion que evalua la pertenencia del elemento item al filtro filter
+//queries the filter to determine whether the element passed is a member or not
 bool bloom_test(bloom_t filter, const void *item) {
 	struct bloom_hash *h = filter->func;
 	int32_t *counters = filter->counters;
@@ -118,6 +102,7 @@ bool bloom_test(bloom_t filter, const void *item) {
 	return true;
 }
 
+//For debugging purposes. Dumps the status of the counters of the filter
 void filter_dump(bloom_t filter) {
 	int32_t* counters = filter->counters;
 	size_t i = 0;

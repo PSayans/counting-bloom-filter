@@ -11,7 +11,9 @@ bloom_t filter;
 unsigned int seed_t;
 unsigned int seed_f;
 
-//bloom_add_hash(bloom,md5)
+/*function that uses openssl implementation of MD5 and obtains an unsigned int which is later passed
+  as an unsigned integer to the filter, which converts it to a position. Because MD5 returns a disgest longer than the one needed, it is splitted
+  in two and passed as different position when the filter is configured to use this function two times */
  uint64_t md5 (const void *_str, int round) {
 
 	MD5_CTX c;
@@ -37,6 +39,9 @@ unsigned int seed_f;
 	return hash;
 }
 
+/*function that uses openssl implementation of SHA1 and obtains an unsigned int which is later passed
+  as an unsigned integer to the filter, which converts it to a position. Because SHA1 returns a disgest longer than the one needed, it is splitted
+  in two and passed as different position when the filter is configured to use this function two times */
  uint64_t sha1 (const void *_str, int round) {
 	 
 	int length=strnlen(_str,64);
@@ -51,14 +56,13 @@ unsigned int seed_f;
 	}
 	else if (round == 3){
 		for (int i = 8; i<16; i++) {
-			//hash = hash + digest[i];
 			hash  = hash | ((uint64_t)digest[i] << (8*(i-8)));
 		}
 	}
-	//printf("%s%zu%s%d%s","Valor de retorno del hash:",hash," en ronda:",round,"\n");
 	return hash;
  }
 
+/*This function receives a vector F and its length and returns the FPP for the filter using F*/
 float measure_fpp (char** f, int vectorLen) {
 	int fpp_counter=0;
 
@@ -71,6 +75,8 @@ float measure_fpp (char** f, int vectorLen) {
 	return f_fpp;
 }
 
+/* Generates a random vector with certain length to use it as F or T. Because of the use of the rand function impplemented in libc, the maximum 
+number of random elements with the same seed is aprox. 32000. This is why this function uses the same random number for different elements of the vector*/
 char ** generate_random_vector(int length, char vector_type) {
 	char ** vector;
 	vector = malloc(length * sizeof(char*));
@@ -105,6 +111,7 @@ char ** generate_random_vector(int length, char vector_type) {
 	return vector;
 }
 
+/* Frees the memory allocated for certain vector */
 void destroy_random_vector(char** vector, int lenght){
 	for(int i=0; i<lenght;i++){
 			free(vector[i]);
@@ -112,11 +119,29 @@ void destroy_random_vector(char** vector, int lenght){
 	free(vector);
 }
 
+/* Implementation of the lookup attack. For more information,please read the README file */
 int main(int argc, char* argv[]) {
+
+	
+	if (argc == 2 && strncmp(argv[1],"-h",2)==0){
+		printf("%s\n","Expected arguments: ");
+		printf("%s\n","1: Length of vector F.");
+		printf("%s\n","2: Length of vector T.");
+		printf("%s\n","3: Number of rounds.");
+		printf("%s\n","4: Size of the Bloom filter.");
+		printf("%s\n","5: Number of hashes.");
+		printf("%s\n","6: Output file for the results.");
+		printf("%s\n","7: Type of progression for T (linear or fixed).");
+		printf("%s\n","8: Factor of progression when linear mode selected (just type 0 when fixed legth used).");
+	}
+
+	if (argc != 9){
+		printf("%s%d\n", "Error: incorrect number of arguments. Expected 8 but received ", argc);
+		return -1;
+	}
 
 	seed_f=30000;
 	seed_t=0;
-	//generar un vector aleatorio de tamaño 64 bits por elemento y de longitud pasada por parámetro
 
 	int vectorLen_f = atoi(argv[1]);
 	double vectorLen_t;
@@ -149,7 +174,7 @@ int main(int argc, char* argv[]) {
 	double alfa = +atof(argv[8]);
 	bool geometrico;
 
-	if (strncmp(argv[7],"geometrico",11)==0){
+	if (strncmp(argv[7],"linear",11)==0){
 		geometrico=true;
 		vectorLen_t=1;
 	}
@@ -185,7 +210,7 @@ int main(int argc, char* argv[]) {
 			fpp_after = measure_fpp(f, vectorLen_f);
 
 			if (fpp_before >= 1){
-				printf("Filtro polucionado\n");
+				printf("Filter polluted.\n");
 				rounds_counter=n_rounds;
 				break;
 			}
@@ -196,7 +221,6 @@ int main(int argc, char* argv[]) {
 				delta_max=delta;
 			}
 			bloom_remove(filter,element);
-			//printf("%s%d%s%fl%s", "El FPP para la ronda: ", rounds_counter," es ",fpp_after, "\n");
 		}
 		bloom_add(filter,best_element);
 		destroy_random_vector(t,(int)vectorLen_t);
@@ -207,11 +231,11 @@ int main(int argc, char* argv[]) {
 	
 	destroy_random_vector(f,vectorLen_f);
 	float time_spent = (float)(end-begin) / CLOCKS_PER_SEC;
-	printf("%s%f%s\n","Tiempo de ejecución: ", time_spent, " segundos");	
+	printf("%s%f%s\n","Execution time: ", time_spent, " seconds");	
 	filter_dump(filter);
 	char** random_vector = generate_random_vector(vectorLen_f, 't');
 	float final_fpp = measure_fpp(random_vector, vectorLen_f);
-	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_fpp," en la ronda ",rounds_counter, "\n");
+	printf("%s%f%s%d%s", "The FPP for the random vector at the end of the execution is:", final_fpp," in round",rounds_counter, "\n");
 	bloom_free(filter);
 
 	FILE *fp;

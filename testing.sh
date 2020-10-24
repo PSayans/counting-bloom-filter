@@ -83,8 +83,8 @@ if [ $1 = "5" ]; then
     do
         for k in 2 3 4 
         do
-            echo "./prediction_algorithm_modified.o 10000 $t_optimo 1500 $m 1000 $k $2"
-            ./prediction_algorithm_modified.o 10000 $t_optimo 1500 $m 1000 $k $2
+            echo "./prediction_algorithm_modified.o 10000 200 2000 $m 1000 $k $2"
+            ./prediction_algorithm_modified.o 10000 200 2000 $m 1000 $k $2
         done
     done
   exit

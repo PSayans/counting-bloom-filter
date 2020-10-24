@@ -247,19 +247,16 @@ int main(int argc, char* argv[]) {
 	while (rounds_counter < lookup_rounds){
 		
 
-		char ** f = generate_random_vector(vectorLen_f,'f');
 		float fpp_before = measure_fpp(f, vectorLen_f);
 
 		if (fpp_before>=0.1){
 			fpp_after=fpp_before;
-			destroy_random_vector(f,vectorLen_f);
 			break;
 		}
 
 		else if (fpp_before >= 1){
 			printf("Filtro polucionado\n");
 			fpp_after=fpp_before;
-			destroy_random_vector(f,vectorLen_f);
 			break;
 		}
 
@@ -288,12 +285,11 @@ int main(int argc, char* argv[]) {
 		}
 		bloom_add(filter,best_element);
 		destroy_random_vector(t, vectorLen_t);
-		destroy_random_vector(f,vectorLen_f);
 		rounds_counter++;
 	}
 
 	/*------------------Fin Algoritmo Lookup-----------------*/
-
+	destroy_random_vector(f,vectorLen_f);
 	char** random_vector1 = generate_random_vector(vectorLen_f,'f');
 	float final_lookup_fpp = measure_fpp(random_vector1, vectorLen_f);
 	printf("%s%f%s%d%s", "El FPP para el vector Z al final de la ejecución es:", final_lookup_fpp," en la ronda ",rounds_counter, "\n");
@@ -310,6 +306,7 @@ int main(int argc, char* argv[]) {
 	bool inserted= false;
 
 	//definimos un array con tantos elementos tenga K para comprobar las deltas
+	f = generate_random_vector(vectorLen_f,'f');
 
 	while (rounds_counter < n_rounds){
 			
